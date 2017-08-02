@@ -52,8 +52,7 @@ fastlane/report.xml
 fastlane/Preview.html
 fastlane/screenshots
 
-# Temporarily exclude ios/android folders
-ios/
-android/
+# Exclude iOS icons
+Images.xcassets/
 icon.png
 splash.png

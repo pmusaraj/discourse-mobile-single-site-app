@@ -1,14 +1,18 @@
-// App variables
+//// Application variables ////
 
 // domain name of the site
-global.siteDomain = 'peshkupauje.com'
-// the app's name, including as displayed in Home Screen
-global.appName = 'Peshku'
-// App ID from OneSignal
-global.oneSignalAppId = '43bce727-f6a7-4362-a5df-edfab5df77ca'
+global.siteDomain = 'your-discourse-site.com'
 
-// URLscheme
-// Change this to a somewhat unique URL scheme for your app
-// Note: make sure you also add "discowhite://auth_redirect" to
+// the app's name
+global.appName = 'DiscoSingle'
+
+// App ID from OneSignal
+global.oneSignalAppId = 'ONESIGNAL_APP_ID'
+
+// Google Project Number - Android only
+global.googleProjectNumber = 'ONESIGNAL_GOOGLE_PROJECT_NUMBER'
+
+// URLscheme - optional, iOS only
+// Note: if you change this, make sure you also add "discosingle://auth_redirect" to
 // your Discourse instance, under Settings > User API > allowed user api auth redirects
 global.URLscheme = 'discosingle'
