@@ -54,5 +54,5 @@ fastlane/screenshots
 
 # Exclude iOS icons
 Images.xcassets/
-icon.png
-splash.png
+icon-*.png
+splash-*.png
