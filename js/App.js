@@ -31,17 +31,17 @@ class App extends React.Component {
     this._Manager
       .generateAuthURL()
       .then(authUrl => {
-        this.setState({uri: authUrl});
+        this.setState({uri: authUrl})
       })
   }
 
   invokeAuthRedirect(url) {
     let split = url.split('payload=')
     if (split.length === 2) {
-      OneSignal.registerForPushNotifications();
+      OneSignal.registerForPushNotifications()
       this._Manager.handleAuthPayload(decodeURIComponent(split[1]))
-      this.setState({uri: site});
-      this.checkAuthStatus();
+      this.setState({uri: site})
+      this.checkAuthStatus()
     }
   }
 
@@ -50,33 +50,27 @@ class App extends React.Component {
       if (json) {
         var data = JSON.parse(json)
         if (data.key) {
-          this.setState({isConnected: true}); 
+          this.setState({isConnected: true})
         }
       }
     })
   }
 
-  _handleOpenUrl(event) {
-    console.log('handling incoming url')
-    console.log(event)
-  }
-
   componentDidMount() {
-    Linking.addEventListener('url', this._handleOpenUrl)
-    OneSignal.addEventListener('opened', this.onOpened.bind(this));
-    this.checkAuthStatus();
+    OneSignal.addEventListener('opened', this._onOpened.bind(this))
+    this.checkAuthStatus()
   }
 
   componentWillUnmount() {
-    Linking.removeEventListener('url', this._handleOpenUrl)
-    OneSignal.removeEventListener('opened', this.onOpened);
+    OneSignal.removeEventListener('opened', this._onOpened)
   }
 
-  onOpened(openResult) {
-    var path = openResult.notification.payload.additionalData.discourse_url;
-    this.setState({uri: site + path});
+  _onOpened(openResult) {
+    if (openResult.notification.payload && openResult.notification.payload.additionalData && openResult.notification.payload.additionalData.discourse_url) {
+      var path = openResult.notification.payload.additionalData.discourse_url
+      this.setState({uri: site + path})
+    }
   }
-
 
   render() {
     return (
@@ -90,10 +84,8 @@ class App extends React.Component {
             mixedContentMode="always"
             onNavigationStateChange={(event) => {
               if (event.url.startsWith(global.URLscheme + '://auth_redirect')) {
-                console.log('auth_redirect hit');
                 this.invokeAuthRedirect(event.url);
               } else if (event.url.indexOf(site) === -1) {
-                console.log('external link hit');
                 this.refs.webview.stopLoading();
                 if (Platform.OS === 'ios') {
                   SafariView.show({url: event.url});
