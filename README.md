@@ -41,6 +41,10 @@ react-native run-android
 
 See the [React Native](https://facebook.github.io/react-native/docs/getting-started.html) docs for more details. 
 
+### Discourse setup
+
+See this [meta entry](https://meta.discourse.org/t/whiltelisted-discourse-app-with-push-notifications-via-onesignal/58247?u=pmusaraj) for details on how to set up your Discourse instance to send Push Notifications via OneSignal.  
+
 ### Android-specific Configuration
 
 You need to set Gradle variables in your user's home folder, under ~/.gradle/gradle.properties for your keychain, OneSignal ID and Google Project Number. Ssee list of variables to set in **DiscoSingle Gradle Variables** section of android/gradle.properties.
