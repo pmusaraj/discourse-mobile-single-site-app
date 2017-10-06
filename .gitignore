@@ -51,8 +51,3 @@ buck-out/
 fastlane/report.xml
 fastlane/Preview.html
 fastlane/screenshots
-
-# Exclude iOS icons
-Images.xcassets/
-icon-*.png
-splash-*.png

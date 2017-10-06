@@ -22,6 +22,11 @@ class Manager {
         }
       }
     })
+
+    AsyncStorage.getItem('@Discourse.clientId').then((clientId) => {
+      this.clientId = clientId || this.randomBytes(16)
+    })
+
   }
 
   ensureRSAKeys() {
@@ -37,7 +42,6 @@ class Manager {
           resolve()
         } else {
           console.log('Generating RSA keys')
-          // console.log(RNKeyPair);
           RNKeyPair.generate((pair)=>{
             this.rsaKeys = pair
             console.log('Generated RSA keys')
@@ -76,15 +80,6 @@ class Manager {
                 .join('&')
   }
 
-  // getClientId() {
-  //   return new Promise(resolve=>{
-  //     AsyncStorage.getItem('@Discourse.device').then((json) => {
-  //       var device = JSON.parse(json)
-  //       resolve(device.userId)
-  //     })
-  //   })
-  // }
-
   generateNonce() {
     return new Promise(resolve=>{
       this._nonce = this.randomBytes(16)
@@ -99,7 +94,6 @@ class Manager {
 	}
 
   generateAuthURL() {
-    let clientId
 
     return this.ensureRSAKeys().then(()=>
       this.generateNonce()
@@ -108,15 +102,16 @@ class Manager {
         let basePushUrl = "https://onesignal.com/api/v1/notifications"
         let params = {
           scopes: 'notifications,session_info',
-          client_id: DeviceInfo.getUniqueID(),
+          client_id: this.clientId,
           nonce: nonce,
           push_url: basePushUrl,
           auth_redirect: global.URLscheme + '://auth_redirect',
-          application_name: global.appName + ' - ' + DeviceInfo.getDeviceName(),
+          application_name: global.appName + ' - ' + (Platform.OS == 'android' ? DeviceInfo.getModel() : DeviceInfo.getDeviceName()),
           public_key: this.rsaKeys.public
         }
 
-        console.log(params)
+        // console.log('auth URL below ------')
+        // console.log(`${site}/user-api-key/new?${this.serializeParams(params)}`)
         return `${site}/user-api-key/new?${this.serializeParams(params)}`
       })
     )
@@ -125,20 +120,15 @@ class Manager {
   getUserInfo() {
     return new Promise((resolve, reject) => {
       if (this.userId && this.username) {
-        console.log('we have user id and user name')
-        resolve({userId: this.userId, username: this.username, isStaff: this.isStaff})
+        resolve({userId: this.userId, username: this.username})
       } else {
         this.jsonApi('/session/current.json')
           .then(json =>{
-            console.log(json)
             this.userId = json.current_user.id
             this.username = json.current_user.username
-            this.isStaff = !!(json.current_user.admin || json.current_user.moderator)
-
             resolve({
               userId: this.userId,
-              username: this.username,
-              isStaff: this.isStaff
+              username: this.username
             })
           })
           .catch(err => {
@@ -150,7 +140,6 @@ class Manager {
 
   jsonApi(path, method) {
     console.log(`calling: ${site}${path}`)
-    console.log(this)
 
     method = method || 'GET'
     let headers = {
@@ -166,17 +155,17 @@ class Manager {
         headers: this.authToken ? headers : null,
         method: method
       })
+
+      console.log('jsonApi request called')
+
       this._currentFetch = fetch(req)
       this._currentFetch.then(r1 => {
         if (r1.status === 200) {
           return r1.json()
         } else {
           if (r1.status === 403) {
-            console.log(path);
-            console.log(r1);
             throw '403 error'
           } else {
-            console.warn('authToken', this.authToken)
             throw 'Error during fetch status code:' + r1.status
           }
         }

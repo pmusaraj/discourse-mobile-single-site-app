@@ -94,18 +94,29 @@ android {
     buildToolsVersion "23.0.2"
 
     defaultConfig {
-        applicationId "com.discosingle"
+        applicationId "com.namecompany.discosingle"
         minSdkVersion 16
-        targetSdkVersion 22
-        versionCode 1
-        versionName "1.0"
+        targetSdkVersion 23
+        versionCode 9
+        versionName "1.1.1"
         ndk {
             abiFilters "armeabi-v7a", "x86"
         }
-        manifestPlaceholders = [onesignal_app_id: "ONESIGNAL_APP_ID",
-                                onesignal_google_project_number: "ONESIGNAL_GOOGLE_PROJECT_NUMBER"]
+        manifestPlaceholders = [onesignal_app_id: DISCOSINGLE_ONESIGNAL_APP_ID,
+                                onesignal_google_project_number: DISCOSINGLE_GOOGLE_PROJECT_NUMBER]
 
     }
+    signingConfigs {
+        release {
+            if (project.hasProperty('DISCOSINGLE_RELEASE_STORE_FILE')) {
+                storeFile file(DISCOSINGLE_RELEASE_STORE_FILE)
+                storePassword DISCOSINGLE_RELEASE_STORE_PASSWORD
+                keyAlias DISCOSINGLE_RELEASE_KEY_ALIAS
+                keyPassword DISCOSINGLE_RELEASE_KEY_PASSWORD
+            }
+        }
+    }
+
     splits {
         abi {
             reset()
@@ -118,6 +129,7 @@ android {
         release {
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            signingConfig signingConfigs.release
         }
     }
     // applicationVariants are e.g. debug, release
@@ -136,6 +148,7 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-webview-file-upload-android')
     compile project(':react-native-onesignal')
     compile project(':react-native-device-info')
     compile project(':react-native-key-pair')

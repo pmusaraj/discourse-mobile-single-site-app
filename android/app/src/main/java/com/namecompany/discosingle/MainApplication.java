@@ -1,8 +1,9 @@
-package com.discosingle;
+package com.namecompany.discosingle;
 
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.oblongmana.webviewfileuploadandroid.AndroidWebViewPackage;
 import com.geektime.rnonesignalandroid.ReactNativeOneSignalPackage;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.RNKeyPair.RNKeyPairPackage;
@@ -26,6 +27,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new AndroidWebViewPackage(),
             new ReactNativeOneSignalPackage(),
             new RNDeviceInfo(),
             new RNKeyPairPackage()

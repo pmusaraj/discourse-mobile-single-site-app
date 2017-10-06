@@ -16,4 +16,3 @@
 @property (strong, nonatomic) RCTOneSignal* oneSignal;
 
 @end
-
