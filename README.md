@@ -16,8 +16,8 @@ npm install -g react-native-cli
 
 Install your packages:
 ```
-cd DiscoSingle
-% npm install
+cd ios/DiscoSingle
+npm install
 ```
 
 Edit `global.js` to set your app's variables (site URL, OneSignal ID, app id, colors, marketing text, etc.) then run the following command to update your app code with the global variables:
