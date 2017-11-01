@@ -73,7 +73,7 @@ cd android && ./gradlew assembleRelease
 ```
 
 ### Features
-A list of possible new features (if interested to fund, please contact me): 
+A list of possible new features (if interested to fund, please contact me via [email](mailto:pmusaraj@gmail.com) or on [meta](https://meta.discourse.org/u/pmusaraj)): 
 
 - reply directly to a Push Notification
 - ipad/tablet UI
