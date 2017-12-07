@@ -461,7 +461,7 @@ class App extends React.Component {
           }}>
             <TouchableHighlight 
               style={{
-                backgroundColor: global.bgColor,
+                backgroundColor: global.connectButtonBgColor,
                 height: 28,
                 padding: 4,
                 borderRadius: 2
@@ -470,7 +470,7 @@ class App extends React.Component {
                 this.loadDiscourseAuth()
             }}>
               <Text style={{
-                color: "#FFF",
+                color: global.connectButtonTextColor,
                 fontSize: 14,
                 paddingLeft: 8,
                 paddingRight: 8,
