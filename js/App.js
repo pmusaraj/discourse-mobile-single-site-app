@@ -224,6 +224,7 @@ class App extends React.Component {
           startInLoadingState={true}
           mixedContentMode="always"
           renderError={ (e) => {if (e === 'WebKitErrorDomain') {return false}}}
+          onMessage={(e) => console.log(e)}
           onNavigationStateChange={(event) => {
             if (event.url.startsWith(global.URLscheme + '://auth_redirect')) {
               this.invokeAuthRedirect(event.url);
