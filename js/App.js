@@ -224,6 +224,7 @@ class App extends React.Component {
           startInLoadingState={true}
           mixedContentMode="always"
           renderError={ (e) => {if (e === 'WebKitErrorDomain') {return false}}}
+          onMessage={(e) => console.log(e)}
           onNavigationStateChange={(event) => {
             if (event.url.startsWith(global.URLscheme + '://auth_redirect')) {
               this.invokeAuthRedirect(event.url);
@@ -461,7 +462,7 @@ class App extends React.Component {
           }}>
             <TouchableHighlight 
               style={{
-                backgroundColor: global.bgColor,
+                backgroundColor: global.connectButtonBgColor,
                 height: 28,
                 padding: 4,
                 borderRadius: 2
@@ -470,7 +471,7 @@ class App extends React.Component {
                 this.loadDiscourseAuth()
             }}>
               <Text style={{
-                color: "#FFF",
+                color: global.connectButtonTextColor,
                 fontSize: 14,
                 paddingLeft: 8,
                 paddingRight: 8,
