@@ -15,19 +15,22 @@ global.oneSignalAppId = 'ONESIGNAL_APP_ID'
 // Google Project Number - Android only
 global.googleProjectNumber = 'ONESIGNAL_GOOGLE_PROJECT_NUMBER'
 
-// URLscheme - optional, iOS only
-// Note: if you change this, make sure you also add "discosingle://auth_redirect" to
-// your Discourse instance, under Settings > User API > allowed user api auth redirects
-global.URLscheme = 'discosingle'
+// Show login form on splash screen
+// Set this to false, especially if your Discourse instance accepts logins from other providers
+// like Facebook, Linkedin, Patreon, etc.
+global.showLoginForm = false
 
 // Styling variables
 global.bgColor = '#FFFFFF'
 global.textColor = '#333333'
 global.buttonColor = '#bb3c2b'
-global.introText = 'Welcome! Please log in or signup to get started. Make sure to authenticate the application in order to enable notifications.';
+global.introText = 'Welcome! This app is a quick way to participate in our community.';
 global.loginText = 'Login'
 global.skipText = 'Skip'
-global.connectText = 'Connect'
+// if showLoginForm is disabled, the following two variables are used
+global.primaryStartButtonText = 'Launch'
+global.secondaryStartButtonText = 'Login'
+global.connectText = 'Enable Push Notifications'
 global.connectButtonBgColor = '#bb3c2b'
 global.connectButtonTextColor = '#FFFFFF'
 global.acctText = 'No account? Click here'
@@ -35,3 +38,4 @@ global.acctUrl = '/signup'
 global.TOSText = 'By continuing, you agree to our '
 global.TOSLinkText = 'Terms of Service'
 global.TOSUrl = '/tos'
+global.TOSTextColor = '#555555'

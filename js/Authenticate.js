@@ -105,8 +105,6 @@ class Authenticate {
     	password: password
     }
 
-    console.log(this.serializeParams(data))
-
     return new Promise((resolve, reject) => {
       let req = new Request(`${site}/session?${this.serializeParams(data)}`, {
         headers: headers,
@@ -116,7 +114,6 @@ class Authenticate {
 
       this._currentFetch = fetch(req)
       this._currentFetch.then((r1) => {
-      	console.log(r1)
         if (r1.status === 200) {
           return r1.json()
         } else {

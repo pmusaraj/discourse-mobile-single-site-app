@@ -20,7 +20,7 @@ class App extends React.Component {
 
     this.state = {
       uri: site,
-      isConnected: true,
+      promptToConnect: false,
       skipLogin: false,
       appLoading: true,
       username: '',
@@ -28,7 +28,8 @@ class App extends React.Component {
       authError: '',
       keyboardVisible: false,
       landscapeLayout: false,
-      appState: AppState.currentState
+      appState: AppState.currentState,
+      pushAuth: false
     };
 
     this._Manager = new Manager()
@@ -54,12 +55,12 @@ class App extends React.Component {
       }).done(done => {
         AsyncStorage.getItem('@Discourse.auth').then((json) => {
           if (json) {
+            console.log(json)
             var auth = JSON.parse(json)
             if (auth.key && auth.push) {
-              this.setState({isConnected: true, skipLogin: true})
+              console.log(auth)
+              this.setState({pushAuth: true})
             }
-          } else {
-            this.setState({isConnected: false})
           }
         }).catch(err => {
           console.log('.auth error')
@@ -116,7 +117,6 @@ class App extends React.Component {
   _handleAppStateChange = (nextAppState) => {
     console.log('APPSTATE: ' + nextAppState)
     if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
-      console.log('App has come to the foreground!')
       if (Platform.OS !== 'ios') {
         OneSignal.clearOneSignalNotifications()
       }
@@ -125,7 +125,7 @@ class App extends React.Component {
   }
 
   onIds(device) {
-    // TODO: this fix properly
+    // TODO: should this be handled differently?
     if (device.userId) {
       AsyncStorage.setItem('@Discourse.clientId', device.userId)
     }
@@ -137,11 +137,12 @@ class App extends React.Component {
     this._Auth
       .login(this.state.username, this.state.password)
       .then(json => {
+        console.log(json)
         this._Manager
           .generateAuthURL()
           .then(authUrl => {
             this.setState({
-              uri: authUrl,
+              uri: site,
               authError: '',
               skipLogin: true
             })
@@ -155,7 +156,7 @@ class App extends React.Component {
       }).done()
   }
 
-  skipInitialLogin() {
+  skipWelcomeScreen() {
     this.setState({skipLogin: true})
     AsyncStorage.setItem('@Discourse.skipLogin', 'loginSkipped')
   }
@@ -169,6 +170,14 @@ class App extends React.Component {
     })    
   }
 
+  loadLoginModal() {
+    AsyncStorage.setItem('@Discourse.skipLogin', 'loginSkipped')
+    this.setState({
+      uri: `${site}/login`,
+      skipLogin: true
+    })    
+  }
+
   TOS() {
     AsyncStorage.setItem('@Discourse.skipLogin', 'loginSkipped')
     this.setState({
@@ -176,7 +185,6 @@ class App extends React.Component {
       authError: '',
       skipLogin: true
     })    
-
   }
 
   _onOpened(openResult) {
@@ -202,33 +210,49 @@ class App extends React.Component {
 
 
   invokeAuthRedirect(url) {
+    this.refs.webview.stopLoading();
     let split = url.split('payload=')
+    console.log('invoked AuthRedirect');
     if (split.length === 2) {
       OneSignal.registerForPushNotifications()
       this._Manager.handleAuthPayload(decodeURIComponent(split[1]))
-      this.setState({uri: site})
       this.checkAuthStatus()
+      this.setState({uri: site})
     }
   }
 
-  renderAView() {
+  renderWebView() {
     if (Platform.OS === 'ios') {
       return (
         <WKWebView
           style={{
-            marginBottom: this.state.isConnected ? 0 : 50,
+            marginBottom: this.state.promptToConnect ? 50 : 0,
             marginTop: 20
           }}
           ref="webview"
           source={{ uri: this.state.uri }}
           startInLoadingState={true}
+          bounces={true}
+          sendCookies={true}
           mixedContentMode="always"
-          renderError={ (e) => {if (e === 'WebKitErrorDomain') {return false}}}
-          onMessage={(e) => console.log(e)}
+          openNewWindowInWebView={true}
+          renderError={ (e, r) => {
+            if (e === 'WebKitErrorDomain') {return false;}
+            if (e === 'NSURLErrorDomain') {return false;}
+          }}
+          onMessage={(e) => {
+            if (!this.state.pushAuth && e.body && e.body.username) { 
+              this.setState({promptToConnect: true})
+            } else {
+              this.setState({promptToConnect: false})
+            }
+          }}
           onNavigationStateChange={(event) => {
-            if (event.url.startsWith(global.URLscheme + '://auth_redirect')) {
+            console.log(event)
+            console.log(event.url.includes('oauth'))
+            if (event.url.startsWith(`${site}/auth_redirect`)) {
               this.invokeAuthRedirect(event.url);
-            } else if (event.url.indexOf(site) === -1) {
+            } else if (event.url.indexOf(site) === -1 && !event.url.includes('oauth')) {
               this.refs.webview.stopLoading();
               SafariView.show({url: event.url});
             }
@@ -241,7 +265,7 @@ class App extends React.Component {
       return (
         <AndroidWebView
           style={{
-            marginBottom: this.state.isConnected ? 0 : 50,
+            marginBottom: this.state.promptToConnect ? 50 : 0,
             marginTop: 0
           }}
           ref="webview"
@@ -254,7 +278,7 @@ class App extends React.Component {
                 backButtonEnabled: event.canGoBack,
             });
 
-            if (event.url.startsWith(global.URLscheme + '://auth_redirect')) {
+            if (event.url.startsWith('https://peshkupauje.com/auth_redirect')) {
               this.invokeAuthRedirect(event.url);
             } else if (event.url.indexOf(site) === -1) {
               this.refs.webview.stopLoading();
@@ -268,6 +292,169 @@ class App extends React.Component {
     }
   }
 
+  renderLoginForm() {
+    return (
+      <View style={{paddingVertical: 20}}>
+        <View style={{paddingVertical: 10}}>
+          <TextInput
+            placeholder='Username'
+            autoCapitalize='none'
+            autoCorrect={false} 
+            autoFocus={true} 
+            returnKeyType={'next'}
+            keyboardType='email-address'
+            value={this.state.username} 
+            style={{
+              color: global.textColor,
+              paddingVertical: 5,
+              borderBottomWidth: Platform.OS === 'ios' ? 1 : 0,
+              borderColor: global.buttonColor
+            }}
+            underlineColorAndroid={global.textColor}
+            onChangeText={(text) => this.setState({ username: text })} />
+        </View>
+        <View>
+          <TextInput 
+            placeholder='Password'
+            autoCapitalize='none'
+            autoCorrect={false} 
+            secureTextEntry={true} 
+            returnKeyType={'go'}
+            value={this.state.password} 
+            style={{
+              color: global.textColor,
+              paddingVertical: 5,
+              borderBottomWidth: Platform.OS === 'ios' ? 1 : 0,
+              borderColor: global.buttonColor
+            }}
+            underlineColorAndroid={global.textColor}
+            onChangeText={(text) => this.setState({ password: text })} />
+        </View>
+        <View>
+          <Text style={{
+            color: global.textColor,
+            fontSize: 16,
+            paddingVertical: 10
+            }}>
+            {this.state.authError}
+          </Text>
+        </View>
+        <View style={{
+            flexDirection: 'row',
+            justifyContent: 'space-around',
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingVertical: 10
+          }}>
+          <View style={{
+            flex: 1,
+            paddingHorizontal: 10,
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <TouchableHighlight 
+              style={{
+                backgroundColor: global.buttonColor,
+                paddingVertical: 8,
+                paddingHorizontal: 16,
+                borderRadius: 3
+              }}
+              onPress={(e) => {this._userLogin(e)}}
+            >
+              <Text style={{
+                color: "#FFF",
+                fontSize: 18,
+                alignItems: 'center'
+              }}>
+                {global.loginText}
+              </Text>
+            </TouchableHighlight>
+          </View>
+          <View style={{
+            flex: 1,
+            alignItems: 'center'
+          }}>
+            <TouchableHighlight 
+              onPress={() => {
+                this.skipWelcomeScreen()
+            }}>
+              <Text style={{color: global.textColor, fontSize: 16}}>
+                {global.skipText}
+              </Text>
+            </TouchableHighlight>
+          </View>
+        </View>
+        {!this.state.keyboardVisible && 
+          <View style={{
+            flex: 1,
+            justifyContent: 'flex-end',
+            paddingVertical: 10,
+            alignItems: 'center'
+          }}>
+            <TouchableHighlight 
+              onPress={() => {
+                this.createAccount()
+            }}>
+              <Text style={{color: global.textColor, fontSize: 14}}>
+                {global.acctText}
+              </Text>
+            </TouchableHighlight>
+          </View>
+        }
+      </View>
+    );
+  }
+  renderStartButtons() {
+    return (
+      <View style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          justifyContent: 'center',
+          paddingVertical: 40
+        }}>
+        <View style={{
+          flex: 1,
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}>
+          <TouchableHighlight 
+            style={{
+              backgroundColor: global.buttonColor,
+              paddingVertical: 8,
+              paddingHorizontal: 20,
+              borderRadius: 3
+            }}
+            onPress={() => {this.skipWelcomeScreen()}}
+          >
+            <Text style={{
+              color: "#FFF",
+              fontSize: 18,
+              alignItems: 'center'
+            }}>
+              {global.primaryStartButtonText}
+            </Text>
+          </TouchableHighlight>
+        </View>
+        <View style={{
+          flex: 1,
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}>
+          <TouchableHighlight 
+            onPress={() => {this.loadLoginModal()}}
+            style={{
+              paddingVertical: 8,
+              paddingHorizontal: 20
+            }}>
+            <Text style={{color: global.textColor, fontSize: 15}}>
+              {global.secondaryStartButtonText}
+            </Text>
+          </TouchableHighlight>
+        </View>
+      </View>
+    );
+  }
   render() {
     if (this.state.appLoading)
       return false
@@ -275,7 +462,7 @@ class App extends React.Component {
     return (
       <View style={{flex: 1, backgroundColor: global.bgColor}} onLayout={this._onLayout.bind(this)}>
         {this.state.uri && this.state.skipLogin &&
-          this.renderAView()
+          this.renderWebView()
         }
 
         {!this.state.skipLogin && 
@@ -304,137 +491,40 @@ class App extends React.Component {
             }
             <View style={{
               flex: 3,
-              paddingHorizontal: 20
+              paddingHorizontal: 20,
+              paddingVertical: 20
             }}>
               {!this.state.keyboardVisible && 
-                <View>
+                <View style={{flex: 1}}>
                   <Text style={{
                     color: global.textColor,
                     fontSize: 16,
-                    paddingVertical: 5
+                    paddingVertical: 10,
+                    textAlign: 'center'
                     }}>
                     {global.introText}
                   </Text>
                 </View>
               }
-              <View style={{
-                    paddingVertical: 10
-                  }}>
-                <TextInput
-                  placeholder='Username'
-                  autoCapitalize='none'
-                  autoCorrect={false} 
-                  autoFocus={true} 
-                  returnKeyType={'next'}
-                  keyboardType='email-address'
-                  value={this.state.username} 
-                  style={{
-                    color: global.textColor,
-                    paddingVertical: 5,
-                    borderBottomWidth: Platform.OS === 'ios' ? 1 : 0,
-                    borderColor: global.buttonColor
-                  }}
-                  underlineColorAndroid={global.textColor}
-                  onChangeText={(text) => this.setState({ username: text })} />
-              </View>
-              <View>
-                <TextInput 
-                  placeholder='Password'
-                  autoCapitalize='none'
-                  autoCorrect={false} 
-                  secureTextEntry={true} 
-                  returnKeyType={'go'}
-                  value={this.state.password} 
-                  style={{
-                    color: global.textColor,
-                    paddingVertical: 5,
-                    borderBottomWidth: Platform.OS === 'ios' ? 1 : 0,
-                    borderColor: global.buttonColor
-                  }}
-                  underlineColorAndroid={global.textColor}
-                  onChangeText={(text) => this.setState({ password: text })} />
-              </View>
-              <View>
-                <Text style={{
-                  color: global.textColor,
-                  fontSize: 16,
-                  paddingVertical: 10
-                  }}>
-                  {this.state.authError}
-                </Text>
-              </View>
-              <View style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-around',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  paddingVertical: 10
-                }}>
-                <View style={{
-                  flex: 1,
-                  paddingHorizontal: 10,
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}>
-                  <TouchableHighlight 
-                    style={{
-                      backgroundColor: global.buttonColor,
-                      paddingVertical: 8,
-                      paddingHorizontal: 16,
-                      borderRadius: 3
-                    }}
-                    onPress={(e) => {this._userLogin(e)}}
-                  >
-                    <Text style={{
-                      color: "#FFF",
-                      fontSize: 18,
-                      alignItems: 'center'
-                    }}>
-                      {global.loginText}
-                    </Text>
-                  </TouchableHighlight>
-                </View>
-                <View style={{
-                  flex: 1,
-                  alignItems: 'center'
-                }}>
-                  <TouchableHighlight 
-                    onPress={() => {
-                      this.skipInitialLogin()
-                  }}>
-                    <Text style={{color: global.textColor, fontSize: 16}}>
-                      {global.skipText}
-                    </Text>
-                  </TouchableHighlight>
-                </View>
-              </View>
-              {!this.state.keyboardVisible && 
-                <View style={{
-                  flex: 1,
-                  justifyContent: 'flex-end',
-                  paddingVertical: 10,
-                  alignItems: 'center'
-                }}>
-                  <TouchableHighlight 
-                    onPress={() => {
-                      this.createAccount()
-                  }}>
-                    <Text style={{color: global.textColor, fontSize: 14}}>
-                      {global.acctText}
-                    </Text>
-                  </TouchableHighlight>
-                </View>
+              {global.showLoginForm &&
+                this.renderLoginForm()
               }
+              {!global.showLoginForm &&
+                this.renderStartButtons()
+              }
+
               <View style={{
                 paddingVertical: 10,
-                alignItems: 'center'
+                alignItems: 'center',
+                flex: 1,
+                justifyContent: 'flex-end'
               }}>
                 <TouchableHighlight 
                   onPress={() => {
                     this.TOS()
                 }}>
                   <Text style={{fontSize: 13}}>
-                    <Text style={{color: 'rgba(255, 255, 255, 0.5)'}}>
+                    <Text style={{color: global.TOSTextColor}}>
                       {global.TOSText}
                     </Text>
                     <Text style={{color: global.textColor}}>
@@ -446,7 +536,8 @@ class App extends React.Component {
             </View>
           </ScrollView>
         }
-        {!this.state.isConnected && this.state.skipLogin && 
+
+        {(this.state.promptToConnect && this.state.skipLogin) && 
           <View style={{
             height: 50, 
             backgroundColor: '#ebebeb', 

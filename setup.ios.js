@@ -23,11 +23,5 @@ replace({
     paths: ['ios/DiscoSingle/AppDelegate.m']
 });
 
-replace({
-    regex: "<string>discosingle</string>",
-    replacement: "<string>" + global.URLscheme + "</string>",
-    paths: ['ios/DiscoSingle/Info.plist']
-});
-
 console.log('## Done replacing global variables ##')
 
