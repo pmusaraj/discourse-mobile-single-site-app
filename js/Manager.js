@@ -105,13 +105,13 @@ class Manager {
           client_id: this.clientId,
           nonce: nonce,
           push_url: basePushUrl,
-          auth_redirect: `${site}/auth_redirect`,
+          auth_redirect: site,
           application_name: global.appName + ' - ' + (Platform.OS == 'android' ? DeviceInfo.getModel() : DeviceInfo.getDeviceName()),
           public_key: this.rsaKeys.public
         }
 
-        console.log('auth URL below ------')
-        console.log(`${site}/user-api-key/new?${this.serializeParams(params)}`)
+        // console.log('auth URL below ------')
+        // console.log(`${site}/user-api-key/new?${this.serializeParams(params)}`)
         return `${site}/user-api-key/new?${this.serializeParams(params)}`
       })
     )

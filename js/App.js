@@ -210,14 +210,13 @@ class App extends React.Component {
 
 
   invokeAuthRedirect(url) {
-    this.refs.webview.stopLoading();
     let split = url.split('payload=')
     console.log('invoked AuthRedirect');
+    console.log(split)
     if (split.length === 2) {
       OneSignal.registerForPushNotifications()
       this._Manager.handleAuthPayload(decodeURIComponent(split[1]))
       this.checkAuthStatus()
-      this.setState({uri: site})
     }
   }
 
@@ -248,9 +247,8 @@ class App extends React.Component {
             }
           }}
           onNavigationStateChange={(event) => {
-            console.log(event)
-            console.log(event.url.includes('oauth'))
-            if (event.url.startsWith(`${site}/auth_redirect`)) {
+            console.log(event.url)
+            if (event.url.includes(`?payload=`)) {
               this.invokeAuthRedirect(event.url);
             } else if (event.url.indexOf(site) === -1 && !event.url.includes('oauth')) {
               this.refs.webview.stopLoading();
@@ -278,7 +276,7 @@ class App extends React.Component {
                 backButtonEnabled: event.canGoBack,
             });
 
-            if (event.url.startsWith('https://peshkupauje.com/auth_redirect')) {
+            if (event.url.startsWith(`${site}?payload`)) {
               this.invokeAuthRedirect(event.url);
             } else if (event.url.indexOf(site) === -1) {
               this.refs.webview.stopLoading();
@@ -436,22 +434,24 @@ class App extends React.Component {
             </Text>
           </TouchableHighlight>
         </View>
-        <View style={{
-          flex: 1,
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}>
-          <TouchableHighlight 
-            onPress={() => {this.loadLoginModal()}}
-            style={{
-              paddingVertical: 8,
-              paddingHorizontal: 20
-            }}>
-            <Text style={{color: global.textColor, fontSize: 15}}>
-              {global.secondaryStartButtonText}
-            </Text>
-          </TouchableHighlight>
-        </View>
+        {global.secondaryStartButtonText != '' &&
+          <View style={{
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <TouchableHighlight 
+              onPress={() => {this.loadLoginModal()}}
+              style={{
+                paddingVertical: 8,
+                paddingHorizontal: 20
+              }}>
+              <Text style={{color: global.textColor, fontSize: 15}}>
+                {global.secondaryStartButtonText}
+              </Text>
+            </TouchableHighlight>
+          </View>
+        }
       </View>
     );
   }
