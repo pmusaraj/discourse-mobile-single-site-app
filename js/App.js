@@ -55,10 +55,8 @@ class App extends React.Component {
       }).done(done => {
         AsyncStorage.getItem('@Discourse.auth').then((json) => {
           if (json) {
-            console.log(json)
             var auth = JSON.parse(json)
             if (auth.key && auth.push) {
-              console.log(auth)
               this.setState({pushAuth: true})
             }
           }
@@ -212,7 +210,6 @@ class App extends React.Component {
   invokeAuthRedirect(url) {
     let split = url.split('payload=')
     console.log('invoked AuthRedirect');
-    console.log(split)
     if (split.length === 2) {
       OneSignal.registerForPushNotifications()
       this._Manager.handleAuthPayload(decodeURIComponent(split[1]))
