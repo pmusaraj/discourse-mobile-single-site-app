@@ -243,8 +243,12 @@ class App extends React.Component {
               this.setState({promptToConnect: false})
             }
           }}
+          injectedJavaScript={
+            // fixes issue with fixed-positioned header not showing up on initial load
+            "if (typeof $ !== 'undefined') {$('.docked .d-header').css('transform', 'translate3d(0,0,0)')};"
+          }
           onNavigationStateChange={(event) => {
-            console.log(event.url)
+            // console.log(event)
             if (event.url.includes(`?payload=`)) {
               this.invokeAuthRedirect(event.url);
             } else if (event.url.indexOf(site) === -1 && !event.url.includes('oauth')) {
