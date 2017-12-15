@@ -14,7 +14,6 @@
 		"react-native-onesignal": "git+https://github.com/bbrcan/react-native-onesignal.git",
 		"react-native-safari-view": "^2.0.0",
 		"react-native-webview-file-upload-android": "git+https://github.com/pmusaraj/react-native-webview-file-upload-android.git",
-		"react-native-wkwebview-reborn": "^1.9.0",
 		"replace": "^0.3.0"
 	},
 	"devDependencies": {

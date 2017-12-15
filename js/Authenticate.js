@@ -13,13 +13,13 @@ class Authenticate {
   login(username, password) {
     return new Promise((resolve, reject) => {
       this.getCSRF().then(json =>{
+        console.log('JSON CSRF =>', json);
       		if (json.csrf) {
 				    AsyncStorage.getItem('@Discourse.loginCookie').then((cookie) => {
 				    	this.discourseLogin(json.csrf, username, password, cookie).then(json =>{
 			    			if (json.error) {
 			    				reject(json)
 			    			} else {
-			    				// console.log(json)
 			    				resolve(json)
 			    			}
         			})
@@ -115,6 +115,8 @@ class Authenticate {
       this._currentFetch = fetch(req)
       this._currentFetch.then((r1) => {
         if (r1.status === 200) {
+          var cookie = r1.headers.map['set-cookie'];
+          AsyncStorage.setItem('@Discourse.loginCookie', JSON.stringify(cookie[0]))
           return r1.json()
         } else {
           if (r1.status === 403) {

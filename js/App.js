@@ -6,7 +6,6 @@ import {  AsyncStorage, WebView, Keyboard, Dimensions,
 import RNKeyPair from 'react-native-key-pair'
 import OneSignal from 'react-native-onesignal'
 import SafariView from 'react-native-safari-view'
-import WKWebView from 'react-native-wkwebview-reborn';
 import AndroidWebView from 'react-native-webview-file-upload-android';
 
 import Manager from './Manager'
@@ -70,6 +69,7 @@ class App extends React.Component {
   }
 
   componentDidMount() {
+
     OneSignal.addEventListener('ids', this.onIds);
     OneSignal.addEventListener('opened', this._onOpened.bind(this))
     AppState.addEventListener('change', this._handleAppStateChange);
@@ -79,13 +79,6 @@ class App extends React.Component {
       OneSignal.inFocusDisplaying(0)
       OneSignal.clearOneSignalNotifications();
     }
-
-    AsyncStorage.getItem('@Discourse.skipLogin').then((json) => {
-      console.log('status: ' + json)
-      if (json && json === 'loginSkipped') {
-        this.setState({skipLogin: true})
-      }
-    })
 
     this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this._keyboardDidShow.bind(this));
     this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this._keyboardDidHide.bind(this));
@@ -135,12 +128,11 @@ class App extends React.Component {
     this._Auth
       .login(this.state.username, this.state.password)
       .then(json => {
-        console.log(json)
         this._Manager
           .generateAuthURL()
           .then(authUrl => {
             this.setState({
-              uri: site,
+              uri: authUrl,
               authError: '',
               skipLogin: true
             })
@@ -209,7 +201,6 @@ class App extends React.Component {
 
   invokeAuthRedirect(url) {
     let split = url.split('payload=')
-    console.log('invoked AuthRedirect');
     if (split.length === 2) {
       OneSignal.registerForPushNotifications()
       this._Manager.handleAuthPayload(decodeURIComponent(split[1]))
@@ -220,7 +211,7 @@ class App extends React.Component {
   renderWebView() {
     if (Platform.OS === 'ios') {
       return (
-        <WKWebView
+        <WebView
           style={{
             marginBottom: this.state.promptToConnect ? 50 : 0,
             marginTop: 20
@@ -229,7 +220,6 @@ class App extends React.Component {
           source={{ uri: this.state.uri }}
           startInLoadingState={true}
           bounces={true}
-          sendCookies={true}
           mixedContentMode="always"
           openNewWindowInWebView={true}
           renderError={ (e, r) => {
@@ -237,6 +227,7 @@ class App extends React.Component {
             if (e === 'NSURLErrorDomain') {return false;}
           }}
           onMessage={(e) => {
+            // TODO: fix onMessage
             if (!this.state.pushAuth && e.body && e.body.username) { 
               this.setState({promptToConnect: true})
             } else {
@@ -245,19 +236,20 @@ class App extends React.Component {
           }}
           injectedJavaScript={
             // fixes issue with fixed-positioned header not showing up on initial load
-            "if (typeof $ !== 'undefined') {$('.docked .d-header').css('transform', 'translate3d(0,0,0)')};"
+            `
+              if (typeof $ !== 'undefined') {
+                $('.docked .d-header').css('transform', 'translate3d(0,0,0)');
+              }
+            `
           }
           onNavigationStateChange={(event) => {
-            // console.log(event)
             if (event.url.includes(`?payload=`)) {
               this.invokeAuthRedirect(event.url);
             } else if (event.url.indexOf(site) === -1 && !event.url.includes('oauth')) {
               this.refs.webview.stopLoading();
               SafariView.show({url: event.url});
             }
-
           }}
-
         />
       );
     } else {
@@ -283,9 +275,7 @@ class App extends React.Component {
               this.refs.webview.stopLoading();
               Linking.openURL(event.url);
             }
-
           }}
-
         />
       );
     }
@@ -383,7 +373,7 @@ class App extends React.Component {
             </TouchableHighlight>
           </View>
         </View>
-        {!this.state.keyboardVisible && 
+        {!this.state.keyboardVisible && global.acctText != '' && 
           <View style={{
             flex: 1,
             justifyContent: 'flex-end',
