@@ -5,8 +5,9 @@ import {  AsyncStorage, WebView, Keyboard, Dimensions,
 
 import RNKeyPair from 'react-native-key-pair'
 import OneSignal from 'react-native-onesignal'
-import SafariView from 'react-native-safari-view'
-import AndroidWebView from 'react-native-webview-file-upload-android';
+import SafariView from 'react-native-safari-view';
+// import AndroidWebView from 'react-native-webview-file-upload-android';
+import CookieManager from 'react-native-cookies';
 
 import Manager from './Manager'
 import Authenticate from './Authenticate'
@@ -69,7 +70,6 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-
     OneSignal.addEventListener('ids', this.onIds);
     OneSignal.addEventListener('opened', this._onOpened.bind(this))
     AppState.addEventListener('change', this._handleAppStateChange);
@@ -79,6 +79,12 @@ class App extends React.Component {
       OneSignal.inFocusDisplaying(0)
       OneSignal.clearOneSignalNotifications();
     }
+
+    AsyncStorage.getItem('@Discourse.skipLogin').then((json) => {
+      if (json && json === 'loginSkipped') {
+        this.setState({skipLogin: true})
+      }
+    })
 
     this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this._keyboardDidShow.bind(this));
     this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this._keyboardDidHide.bind(this));
@@ -187,18 +193,14 @@ class App extends React.Component {
   _keyboardDidShow (e) {
     this.setState({keyboardVisible: true})
   }
-
   _keyboardDidHide (e) {
     this.setState({keyboardVisible: false})
   }
-
   _onLayout () {
     const {width, height} = Dimensions.get('window')
     if (width > height)
       this.setState({landscapeLayout: true})
   }
-
-
   invokeAuthRedirect(url) {
     let split = url.split('payload=')
     if (split.length === 2) {
@@ -207,7 +209,6 @@ class App extends React.Component {
       this.checkAuthStatus()
     }
   }
-
   renderWebView() {
     if (Platform.OS === 'ios') {
       return (
@@ -226,14 +227,6 @@ class App extends React.Component {
             if (e === 'WebKitErrorDomain') {return false;}
             if (e === 'NSURLErrorDomain') {return false;}
           }}
-          onMessage={(e) => {
-            // TODO: fix onMessage
-            if (!this.state.pushAuth && e.body && e.body.username) { 
-              this.setState({promptToConnect: true})
-            } else {
-              this.setState({promptToConnect: false})
-            }
-          }}
           injectedJavaScript={
             // fixes issue with fixed-positioned header not showing up on initial load
             `
@@ -243,41 +236,54 @@ class App extends React.Component {
             `
           }
           onNavigationStateChange={(event) => {
-            if (event.url.includes(`?payload=`)) {
-              this.invokeAuthRedirect(event.url);
-            } else if (event.url.indexOf(site) === -1 && !event.url.includes('oauth')) {
-              this.refs.webview.stopLoading();
-              SafariView.show({url: event.url});
+            if (!event.loading && !this.state.pushAuth) {
+              CookieManager.get(site)
+              .then((res) => {
+                if (res._t && res._forum_session) {
+                  this.setState({promptToConnect: false})
+                } else {
+                  this.setState({promptToConnect: true})
+                }
+              });
             }
-          }}
-        />
-      );
-    } else {
-      return (
-        <AndroidWebView
-          style={{
-            marginBottom: this.state.promptToConnect ? 50 : 0,
-            marginTop: 0
-          }}
-          ref="webview"
-          source={{ uri: this.state.uri }}
-          startInLoadingState={true}
-          mixedContentMode="always"
-          renderError={ (e) => {if (e === 'WebKitErrorDomain') {return false}}}
-          onNavigationStateChange={(event) => {
-            this.setState({
-                backButtonEnabled: event.canGoBack,
-            });
 
-            if (event.url.startsWith(`${site}?payload`)) {
-              this.invokeAuthRedirect(event.url);
-            } else if (event.url.indexOf(site) === -1) {
-              this.refs.webview.stopLoading();
-              Linking.openURL(event.url);
+            if (event.loading) {
+              if (event.url.includes(`?payload=`)) {
+                this.invokeAuthRedirect(event.url);
+              } else if (event.url.indexOf(site) === -1 && !event.url.includes('oauth')) {
+                this.refs.webview.stopLoading();
+                SafariView.show({url: event.url});
+              }
             }
           }}
         />
       );
+    // } else {
+    //   return (
+    //     <AndroidWebView
+    //       style={{
+    //         marginBottom: this.state.promptToConnect ? 50 : 0,
+    //         marginTop: 0
+    //       }}
+    //       ref="webview"
+    //       source={{ uri: this.state.uri }}
+    //       startInLoadingState={true}
+    //       mixedContentMode="always"
+    //       renderError={ (e) => {if (e === 'WebKitErrorDomain') {return false}}}
+    //       onNavigationStateChange={(event) => {
+    //         this.setState({
+    //             backButtonEnabled: event.canGoBack,
+    //         });
+
+    //         if (event.url.startsWith(`${site}?payload`)) {
+    //           this.invokeAuthRedirect(event.url);
+    //         } else if (event.url.indexOf(site) === -1) {
+    //           this.refs.webview.stopLoading();
+    //           Linking.openURL(event.url);
+    //         }
+    //       }}
+    //     />
+    //   );
     }
   }
 

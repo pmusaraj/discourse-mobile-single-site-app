@@ -72,6 +72,10 @@ import com.android.build.OutputFile
  * ]
  */
 
+project.ext.react = [
+    entryFile: "index.js"
+]
+
 apply from: "../../node_modules/react-native/react.gradle"
 
 /**
@@ -91,32 +95,18 @@ def enableProguardInReleaseBuilds = false
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.2"
+    buildToolsVersion "23.0.1"
 
     defaultConfig {
-        applicationId "com.namecompany.discosingle"
+        applicationId "com.discosingle"
         minSdkVersion 16
-        targetSdkVersion 23
-        versionCode 9
-        versionName "1.1.1"
+        targetSdkVersion 22
+        versionCode 1
+        versionName "1.0"
         ndk {
             abiFilters "armeabi-v7a", "x86"
         }
-        manifestPlaceholders = [onesignal_app_id: DISCOSINGLE_ONESIGNAL_APP_ID,
-                                onesignal_google_project_number: DISCOSINGLE_GOOGLE_PROJECT_NUMBER]
-
     }
-    signingConfigs {
-        release {
-            if (project.hasProperty('DISCOSINGLE_RELEASE_STORE_FILE')) {
-                storeFile file(DISCOSINGLE_RELEASE_STORE_FILE)
-                storePassword DISCOSINGLE_RELEASE_STORE_PASSWORD
-                keyAlias DISCOSINGLE_RELEASE_KEY_ALIAS
-                keyPassword DISCOSINGLE_RELEASE_KEY_PASSWORD
-            }
-        }
-    }
-
     splits {
         abi {
             reset()
@@ -129,7 +119,6 @@ android {
         release {
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-            signingConfig signingConfigs.release
         }
     }
     // applicationVariants are e.g. debug, release
@@ -148,10 +137,11 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-cookies')
     compile project(':react-native-webview-file-upload-android')
     compile project(':react-native-onesignal')
-    compile project(':react-native-device-info')
     compile project(':react-native-key-pair')
+    compile project(':react-native-device-info')
     compile fileTree(dir: "libs", include: ["*.jar"])
     compile "com.android.support:appcompat-v7:23.0.1"
     compile "com.facebook.react:react-native:+"  // From node_modules

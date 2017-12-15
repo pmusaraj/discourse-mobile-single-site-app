@@ -16,9 +16,9 @@ global.oneSignalAppId = 'ONESIGNAL_APP_ID'
 global.googleProjectNumber = 'ONESIGNAL_GOOGLE_PROJECT_NUMBER'
 
 // Show login form on splash screen
-// Set this to false, especially if your Discourse instance accepts logins from other providers
-// like Facebook, Linkedin, Patreon, etc.
-global.showLoginForm = false
+// May be useful to set this to false if your Discourse instance accepts logins from other providers
+// like Facebook, Linkedin, Patreon, etc. (Note: this may adversely affect Apple review process)
+global.showLoginForm = true
 
 // Styling variables
 global.bgColor = '#FFFFFF'
