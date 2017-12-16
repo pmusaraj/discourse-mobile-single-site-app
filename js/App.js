@@ -209,6 +209,34 @@ class App extends React.Component {
       this.checkAuthStatus()
     }
   }
+  _onNavigationStateChange(event) {
+    // only prompt to authorize Notifications if user is logged in to Discourse and doesn't have pushAuth enabled
+    if (!event.loading && !this.state.pushAuth && !event.url.includes(`user-api-key`)) {
+      CookieManager.get(site)
+      .then((res) => {
+        if (res._t && res._forum_session) {
+          this.setState({promptToConnect: true})
+        } else {
+          this.setState({promptToConnect: false})
+        }
+      });
+    } else {
+      this.setState({promptToConnect: false})
+    }
+
+    if (event.loading && event.url.includes(`?payload=`)) {
+      this.invokeAuthRedirect(event.url);
+    }
+  }
+  _onShouldStartLoadWithRequest(event) {
+    if (event.url.indexOf(site) === -1 && !event.url.includes('oauth')) {
+      this.refs.webview.stopLoading();
+      SafariView.show({url: event.url});
+      return false;
+    }
+
+    return true
+  }
   renderWebView() {
     if (Platform.OS === 'ios') {
       return (
@@ -221,41 +249,14 @@ class App extends React.Component {
           source={{ uri: this.state.uri }}
           startInLoadingState={true}
           bounces={true}
-          mixedContentMode="always"
+          mixedContentMode='always'
           openNewWindowInWebView={true}
-          renderError={ (e, r) => {
-            if (e === 'WebKitErrorDomain') {return false;}
-            if (e === 'NSURLErrorDomain') {return false;}
-          }}
           injectedJavaScript={
             // fixes issue with fixed-positioned header not showing up on initial load
-            `
-              if (typeof $ !== 'undefined') {
-                $('.docked .d-header').css('transform', 'translate3d(0,0,0)');
-              }
-            `
+            `if (typeof $ !== 'undefined') {$('.docked .d-header').css('transform', 'translate3d(0,0,0)');}`
           }
-          onNavigationStateChange={(event) => {
-            if (!event.loading && !this.state.pushAuth) {
-              CookieManager.get(site)
-              .then((res) => {
-                if (res._t && res._forum_session) {
-                  this.setState({promptToConnect: false})
-                } else {
-                  this.setState({promptToConnect: true})
-                }
-              });
-            }
-
-            if (event.loading) {
-              if (event.url.includes(`?payload=`)) {
-                this.invokeAuthRedirect(event.url);
-              } else if (event.url.indexOf(site) === -1 && !event.url.includes('oauth')) {
-                this.refs.webview.stopLoading();
-                SafariView.show({url: event.url});
-              }
-            }
-          }}
+          onNavigationStateChange={this._onNavigationStateChange.bind(this)}
+          onShouldStartLoadWithRequest={this._onShouldStartLoadWithRequest.bind(this)}
         />
       );
     // } else {
