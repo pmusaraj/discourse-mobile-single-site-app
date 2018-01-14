@@ -87,6 +87,8 @@ npm install react-native-rename -g
 react-native-rename "NewName" -b com.yourco.yourappid
 ```
 
+Note: the bundle name only applies to Android. To change your iOS bundle ID, use Xcode. 
+
 ### Troubleshooting
 
 If you are having a `ld: library not found for -lRNDeviceInfo-tvOS` error, try manually deleting `libRNDeviceInfo-tvOS.a` in Xcode -> [Your iOS build target] -> Build Phases -> Link Binary with Libraries.
@@ -95,9 +97,10 @@ Android file uploads may fail. The app uses https://github.com/dahjelle/react-na
 
 
 ### Upcoming Features
-A list of possible new features (if interested to fund, please contact me via [email](mailto:pmusaraj@gmail.com) or on [meta](https://meta.discourse.org/u/pmusaraj)): 
+A list of potential upcoming features (if interested to fund, please contact me via [email](mailto:pmusaraj@gmail.com) or on [meta](https://meta.discourse.org/u/pmusaraj)): 
 
 - reply directly to a Push Notification
 - ipad/tablet UI
 - inApp signup form
 - ios: swipe to go back/forward
+- test and support logins via other services (app currently works with Facebook, Patreon)
