@@ -1,4 +1,4 @@
-package com.namecompany.discosingle;
+package com.discosingle;
 
 import com.facebook.react.ReactActivity;
 

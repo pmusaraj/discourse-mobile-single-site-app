@@ -1,12 +1,13 @@
-package com.namecompany.discosingle;
+package com.discosingle;
 
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
 import com.oblongmana.webviewfileuploadandroid.AndroidWebViewPackage;
 import com.geektime.rnonesignalandroid.ReactNativeOneSignalPackage;
-import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.RNKeyPair.RNKeyPairPackage;
+import com.learnium.RNDeviceInfo.RNDeviceInfo;
+import com.psykar.cookiemanager.CookieManagerPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
@@ -29,9 +30,15 @@ public class MainApplication extends Application implements ReactApplication {
           new MainReactPackage(),
             new AndroidWebViewPackage(),
             new ReactNativeOneSignalPackage(),
+            new RNKeyPairPackage(),
             new RNDeviceInfo(),
-            new RNKeyPairPackage()
+            new CookieManagerPackage()
       );
+    }
+
+    @Override
+    protected String getJSMainModuleName() {
+      return "index";
     }
   };
 

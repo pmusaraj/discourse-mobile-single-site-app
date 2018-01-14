@@ -1,7 +1,13 @@
 #!/usr/bin/env node
 
 var replace = require("replace");
-require("./global.js");
+var fs = require('fs');
+
+if (fs.existsSync("./app.variables.js")) {
+    require("./app.variables.js");
+} else {
+    require("./default.variables.js");
+}
 
 console.log('## Start replacing app variables ##')
 
@@ -21,12 +27,6 @@ replace({
     regex: "ONESIGNAL_APP_ID",
     replacement: global.oneSignalAppId,
     paths: ['ios/DiscoSingle/AppDelegate.m']
-});
-
-replace({
-    regex: "<string>discosingle</string>",
-    replacement: "<string>" + global.URLscheme + "</string>",
-    paths: ['ios/DiscoSingle/Info.plist']
 });
 
 console.log('## Done replacing global variables ##')
