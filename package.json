@@ -14,7 +14,6 @@
 		"react-native-key-pair": "git+https://github.com/samsaffron/react-native-key-pair.git",
 		"react-native-onesignal": "git+https://github.com/bbrcan/react-native-onesignal.git",
 		"react-native-safari-view": "^2.1.0",
-		"react-native-webview-file-upload-android": "git+https://github.com/pmusaraj/react-native-webview-file-upload-android.git",
 		"replace": "^0.3.0"
 	},
 	"devDependencies": {

@@ -19,7 +19,7 @@ Within the repository folder, install your packages:
 npm install
 ```
 
-Edit `global.js` to set your app's variables (site URL, OneSignal ID, app id, colors, marketing text, etc.) then run the following command to update your app code with the global variables:
+Copy the contents of `default.variables.js` to `app.variables.js` to set your app's variables (site URL, OneSignal ID, app id, colors, marketing text, etc.) then run the following commands to update your app code with the overriden variables:
 ```
 node setup.ios.js
 node setup.android.js
@@ -44,17 +44,13 @@ You need to open an account at OneSignal to be able to send Push Notifications (
 - Create an iCloud container and associate it with your App ID.
 
 
-### Discourse setup
+### OneSignal Discourse Setup
 
 Add the [discourse-onesignal](https://github.com/pmusaraj/discourse-onesignal/) plugin to your Discourse instance and configure it: enable notifications, add your OneSignal App ID and the OneSignal REST API key.
 
-In your Discourse settings, add `discosingle://auth_redirect` to `allowed user api auth redirects`. 
+In your Discourse settings, add your site's home URL to `allowed user api auth redirects` (the app will redirect to your home URL once the user authorizes access for the app in Discourse). 
 
-You should now be ready to build and test the app in Xcode our using react-native run-ios on the command line. (To test push notifications, you need to set up your app on your phone, either via ad-hoc or through TestFlight.)
-
-### Android-specific Configuration
-
-You need to set Gradle variables in your user's home folder, under ~/.gradle/gradle.properties for your keychain, OneSignal ID and Google Project Number. Ssee list of variables to set in **DiscoSingle Gradle Variables** section of `android/gradle.properties`.
+You should now be ready to build and test the app in Xcode our using `react-native run-ios` on the command line. (Push Notifications can be tested on a real device only, but the OneSignal console will show any attempts to enable Push Notifications on a simulator.)
 
 ### Helpful Tools
 
@@ -87,6 +83,10 @@ You may have to change the ID of the app, in which case, you would need to run a
 npm install react-native-rename -g
 react-native-rename "NewName" -b com.yourco.yourappid
 ```
+
+### Troubleshooting
+
+If you are having a `ld: library not found for -lRNDeviceInfo-tvOS` error, try manually deleting `libRNDeviceInfo-tvOS.a` in Xcode -> [Your iOS build target] -> Build Phases -> Link Binary with Libraries.
 
 ### Upcoming Features
 A list of possible new features (if interested to fund, please contact me via [email](mailto:pmusaraj@gmail.com) or on [meta](https://meta.discourse.org/u/pmusaraj)): 

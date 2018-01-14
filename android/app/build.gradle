@@ -139,7 +139,6 @@ android {
 }
 
 dependencies {
-    compile project(':react-native-webview-file-upload-android')
     compile project(':react-native-onesignal')
     compile project(':react-native-key-pair')
     compile project(':react-native-device-info')
