@@ -6,14 +6,11 @@ global.siteDomain = 'example.com'
 // the app's name
 global.appName = 'DiscoSingle'
 
-global.androidAppId = 'com.namecompany.discosingle'
-global.iosAppId = 'com.namecompany.discosingle'
+// App ID from OneSignal (see readme, needs manual update)
+// global.oneSignalAppId = 'ONESIGNAL_APP_ID'
 
-// App ID from OneSignal
-global.oneSignalAppId = 'ONESIGNAL_APP_ID'
-
-// Google Project Number - Android only
-global.googleProjectNumber = 'ONESIGNAL_GOOGLE_PROJECT_NUMBER'
+// Google Project Number - Android only (see readme, needs manual update)
+// global.googleProjectNumber = 'ONESIGNAL_GOOGLE_PROJECT_NUMBER'
 
 // Show login form on splash screen
 global.showLoginForm = true
