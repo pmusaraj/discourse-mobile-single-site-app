@@ -88,6 +88,8 @@ react-native-rename "NewName" -b com.yourco.yourappid
 
 If you are having a `ld: library not found for -lRNDeviceInfo-tvOS` error, try manually deleting `libRNDeviceInfo-tvOS.a` in Xcode -> [Your iOS build target] -> Build Phases -> Link Binary with Libraries.
 
+Android file uploads may fail. The app uses https://github.com/dahjelle/react-native-android-webview-file-image-upload to enable file uploads in WebView, but it's not tested extensively. 
+
 ### Upcoming Features
 A list of possible new features (if interested to fund, please contact me via [email](mailto:pmusaraj@gmail.com) or on [meta](https://meta.discourse.org/u/pmusaraj)): 
 
