@@ -105,7 +105,7 @@ class Manager {
           client_id: this.clientId,
           nonce: nonce,
           push_url: basePushUrl,
-          auth_redirect: global.URLscheme + '://auth_redirect',
+          auth_redirect: site,
           application_name: global.appName + ' - ' + (Platform.OS == 'android' ? DeviceInfo.getModel() : DeviceInfo.getDeviceName()),
           public_key: this.rsaKeys.public
         }
