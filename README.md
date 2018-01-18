@@ -57,14 +57,11 @@ You should now be ready to build and test the app. Note that in iOS, Push Notifi
 ### Helpful Tools
 
 #### Generating assets
-Use the React Native generator to setup icons and splash screens for the app: 
+Use [generator-rn-toolbox](https://github.com/bamlab/generator-rn-toolbox) to setup icons and splash screens for the app: 
 
 ```
-// https://github.com/bamlab/generator-rn-toolbox
 npm install -g yo generator-rn-toolbox
-```
-and then 
-```
+
 yo rn-toolbox:assets --icon icon.png
 yo rn-toolbox:assets --splash splash.png --android
 yo rn-toolbox:assets --splash splash.png --ios
@@ -87,20 +84,19 @@ npm install react-native-rename -g
 react-native-rename "NewName" -b com.yourco.yourappid
 ```
 
-Note: the bundle name only applies to Android. To change your iOS bundle ID, use Xcode. 
+(The bundle name specified by `-b` above only applies to Android, to change your iOS bundle ID, use Xcode.)
 
 ### Troubleshooting
 
-If you are having a `ld: library not found for -lRNDeviceInfo-tvOS` error, try manually deleting `libRNDeviceInfo-tvOS.a` in Xcode -> [Your iOS build target] -> Build Phases -> Link Binary with Libraries.
+- If you are having a `ld: library not found for -lRNDeviceInfo-tvOS` error, try manually deleting `libRNDeviceInfo-tvOS.a` in Xcode -> [Your iOS build target] -> Build Phases -> Link Binary with Libraries.
+- Android file uploads may fail. The app uses https://github.com/dahjelle/react-native-android-webview-file-image-upload to enable file uploads in WebView, but it's not tested with all versions of Android.
+- If you have already checked out the project, and renamed the app, you may run into a variety of file conflicts if you pull updates. This is especially the case if the React Native version in the project has been updated. This is normal, and a better course of action is to check out a fresh copy, and reapply your changes and the rename. 
 
-Android file uploads may fail. The app uses https://github.com/dahjelle/react-native-android-webview-file-image-upload to enable file uploads in WebView, but it's not tested extensively. 
-
-
-### Upcoming Features
+### Upcoming Features Wishlist
 A list of potential upcoming features (if interested to fund, please contact me via [email](mailto:pmusaraj@gmail.com) or on [meta](https://meta.discourse.org/u/pmusaraj)): 
 
 - reply directly to a Push Notification
 - ipad/tablet UI
 - inApp signup form
 - ios: swipe to go back/forward
-- test and support logins via other services (app currently works with Facebook, Patreon)
+- test and support logins via other services (app currently works with Facebook, Patreon, Linkedin)
