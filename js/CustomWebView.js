@@ -52,8 +52,16 @@ export default class CustomWebView extends Component {
     this.webview.injectJavaScript(...args);
   }
 
+  injectedJavaScript(...args) {
+    this.webview.injectedJavaScript(...args);
+  }
+
   reload(...args) {
     this.webview.reload(...args);
+  }
+
+  stopLoading(...args) {
+    this.webview.stopLoading(...args);
   }
 }
 

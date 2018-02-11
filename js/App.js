@@ -106,7 +106,7 @@ class App extends React.Component {
 
   _backHandler = () => {
     if (this.state.backButtonEnabled) {
-      this.refs['webview'].goBack();
+      this.webview.goBack();
       return true;
     }
   }
@@ -237,15 +237,15 @@ class App extends React.Component {
 
     // Android only, open device browser for external links 
     if (Platform.OS === 'android' && event.url.indexOf(site) === -1 && !event.url.includes('oauth')) {
-      this.refs.webview.stopLoading();
+      this.webview.stopLoading();
       Linking.openURL(event.url);        
+      return false;
     }
   }
   _onShouldStartLoadWithRequest(event) {
     // _onShouldStartLoadWithRequest runs on iOS only
     // open device browser for external links
     if (Platform.OS === 'ios' && event.url.indexOf(site) === -1 && !event.url.includes('oauth')) {
-      this.refs.webview.stopLoading();
       SafariView.show({url: event.url});
       return false;
     }
@@ -259,7 +259,7 @@ class App extends React.Component {
           marginBottom: this.state.promptToConnect ? 50 : 0,
           marginTop: 20
         }}
-        ref="webview"
+        ref={(ref) => { this.webview = ref; }}
         source={{ uri: this.state.uri }}
         startInLoadingState={true}
         bounces={true}
@@ -283,7 +283,7 @@ class App extends React.Component {
             placeholder='Username'
             autoCapitalize='none'
             autoCorrect={false} 
-            autoFocus={true} 
+            autoFocus={false} 
             returnKeyType={'next'}
             keyboardType='email-address'
             value={this.state.username} 
@@ -477,7 +477,7 @@ class App extends React.Component {
             <View style={{
               flex: 3,
               paddingHorizontal: 20,
-              paddingVertical: 20
+              paddingVertical: 10
             }}>
               {!this.state.keyboardVisible && 
                 <View style={{flex: 1}}>
@@ -501,7 +501,7 @@ class App extends React.Component {
               <View style={{
                 paddingVertical: 10,
                 alignItems: 'center',
-                flex: 1,
+                flex: 0,
                 justifyContent: 'flex-end'
               }}>
                 <TouchableHighlight 
