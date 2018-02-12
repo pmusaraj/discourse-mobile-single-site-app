@@ -21,7 +21,8 @@ const {CustomWebViewManager} = NativeModules;
  *   1. Use the built-in React Native WebView on iOS.
  *   2. Be a drop-in replacement for the Android WebView with the additional functionality for file uploads.
  *
- * This requires several Java files to work: CustomWebViewManager.java, CustomWebViewModule.java, and CustomWebViewPackage.java. Additionally, the MainApplication.java file needs to be edited to include the new package.
+ * This requires several Java files to work: CustomWebViewManager.java, CustomWebViewModule.java, and CustomWebViewPackage.java. 
+ * Additionally, the MainApplication.java file needs to be edited to include the new package.
  *
  * Lots of guidance from [the example project for the original PR](https://github.com/cbrevik/webview-native-config-example) and from [a sample Android webview](https://github.com/hushicai/ReactNativeAndroidWebView).
  */
@@ -62,6 +63,11 @@ export default class CustomWebView extends Component {
 
   stopLoading(...args) {
     this.webview.stopLoading(...args);
+  }
+
+  goBack() {
+    this.webview.goBack();
+    return true;
   }
 }
 

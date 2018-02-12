@@ -105,10 +105,8 @@ class App extends React.Component {
   }
 
   _backHandler = () => {
-    if (this.state.backButtonEnabled) {
-      this.webview.goBack();
-      return true;
-    }
+    this.webview.goBack();
+    return true;
   }
 
   _handleAppStateChange = (nextAppState) => {
@@ -210,12 +208,6 @@ class App extends React.Component {
     }
   }
   _onNavigationStateChange(event) {
-    // enable back button on Android
-    if (!event.loading && Platform.OS === 'android') {
-      this.setState({
-          backButtonEnabled: event.canGoBack,
-      });
-    }
 
     // only prompt to authorize Notifications if user is logged in to Discourse and doesn't have pushAuth enabled
     if (!event.loading && !this.state.pushAuth && !event.url.includes(`user-api-key`)) {
