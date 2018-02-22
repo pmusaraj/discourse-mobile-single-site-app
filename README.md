@@ -72,9 +72,11 @@ The logo file for the login screen is under `js/logo.png`. Replace it with your 
 
 
 #### Android build using Gradle
+Follow the [official React Native](https://facebook.github.io/react-native/docs/signed-apk-android.html) instructions on generating a key and an APK for release. Then run
 ```
 cd android && ./gradlew assembleRelease
 ```
+and find your release file under `android/app/build/outputs/apk/app-release.apk`. 
 
 #### Renaming your App
 
