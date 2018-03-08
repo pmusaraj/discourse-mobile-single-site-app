@@ -273,10 +273,10 @@ class App extends React.Component {
 
   renderLoginForm() {
     return (
-      <View style={{paddingVertical: 20}}>
+      <View style={{paddingVertical: 10}}>
         <View style={{paddingVertical: 10}}>
           <TextInput
-            placeholder='Username'
+            placeholder={global.usernamePlaceholder}
             autoCapitalize='none'
             autoCorrect={false} 
             autoFocus={false} 
@@ -287,14 +287,15 @@ class App extends React.Component {
               color: global.textColor,
               paddingVertical: 5,
               borderBottomWidth: Platform.OS === 'ios' ? 1 : 0,
-              borderColor: global.buttonColor
+              borderColor: global.buttonColor,
+              height: 36
             }}
             underlineColorAndroid={global.textColor}
             onChangeText={(text) => this.setState({ username: text })} />
         </View>
-        <View>
+        <View style={{paddingVertical: 10}}>
           <TextInput 
-            placeholder='Password'
+            placeholder={global.passwordPlaceholder}
             autoCapitalize='none'
             autoCorrect={false} 
             secureTextEntry={true} 
@@ -304,7 +305,8 @@ class App extends React.Component {
               color: global.textColor,
               paddingVertical: 5,
               borderBottomWidth: Platform.OS === 'ios' ? 1 : 0,
-              borderColor: global.buttonColor
+              borderColor: global.buttonColor,
+              height: 36
             }}
             underlineColorAndroid={global.textColor}
             onChangeText={(text) => this.setState({ password: text })} />

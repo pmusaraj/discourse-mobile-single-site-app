@@ -35,3 +35,6 @@ global.TOSText = 'By continuing, you agree to our '
 global.TOSLinkText = 'Terms of Service'
 global.TOSUrl = '/tos'
 global.TOSTextColor = '#555555'
+
+global.usernamePlaceholder = 'Username'
+global.passwordPlaceholder = 'Password'
