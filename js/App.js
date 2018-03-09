@@ -309,6 +309,7 @@ class App extends React.Component {
               height: 36
             }}
             underlineColorAndroid={global.textColor}
+            onSubmitEditing={(e) => {this._userLogin(e)}}
             onChangeText={(text) => this.setState({ password: text })} />
         </View>
         <View>
