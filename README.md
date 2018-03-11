@@ -88,6 +88,8 @@ react-native-rename "NewName" -b com.yourco.yourappid
 
 (The bundle name specified by `-b` above only applies to Android, to change your iOS bundle ID, use Xcode.)
 
+After renaming the app, you need to manually edit some files in subfolders under `android/app/src/main/java`, and replace `com.discosingle;` at the beginning of every file with your new bundle ID. The rename script does it for `MainActivity.java` and `MainApplication.java`, you need to manually do this for the remaining files. 
+
 ### Troubleshooting
 
 - If you are having a `ld: library not found for -lRNDeviceInfo-tvOS` error, try manually deleting `libRNDeviceInfo-tvOS.a` in Xcode -> [Your iOS build target] -> Build Phases -> Link Binary with Libraries.
