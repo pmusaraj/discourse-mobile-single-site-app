@@ -5,7 +5,7 @@ Whitelisted iOS and Android app for a single Discourse site that supports Push N
 
 Built with React Native. Inspired by [DiscourseMobile](https://github.com/discourse/DiscourseMobile).
 
-**For a demonstration** check out the SWAPD app on the App Store or Google Play. 
+For a demonstration check out SWAPD or TekInvestor on the App Store or Google Play. 
 
 ### Getting Started
 
@@ -41,18 +41,18 @@ You need to open an account at OneSignal to be able to send Push Notifications (
 
 #### OneSignal Discourse Setup
 
-Add the [discourse-onesignal](https://github.com/pmusaraj/discourse-onesignal/) plugin to your Discourse instance and configure it: enable notifications, add your OneSignal App ID and the OneSignal REST API key.
-
-In your Discourse settings, add your site's home URL to `allowed user api auth redirects` (the app will redirect to your home URL once the user authorizes access for the app in Discourse). And add the OneSignal Push Endpoint URL `https://onesignal.com/api/v1/notifications` to `allowed user api push urls`.
+- Add the [discourse-onesignal](https://github.com/pmusaraj/discourse-onesignal/) plugin to your Discourse instance and configure it: enable notifications, add your OneSignal App ID and the OneSignal REST API key.
+- In your Discourse settings, add your site's home URL to `allowed user api auth redirects` (the app will redirect to your home URL once the user authorizes access for the app in Discourse). 
+- And add the OneSignal API Endpoint `https://onesignal.com/api/v1/notifications` to `allowed user api push urls`.
 
 #### OneSignal updates to native code
 
-In your app code for either iOS or Android, you need to replace the placeholder OneSignal App ID with your app's. 
+In your app code for either iOS or Android, you need to replace the placeholder OneSignal App ID with your app's OneSignal App ID. 
 
-For iOS, look for `ONESIGNAL_APP_ID` in `ios/DiscoSingle/AppDelegate.m`. 
-For Android, look for `DISCOSINGLE_ONESIGNAL_APP_ID` and `DISCOSINGLE_GOOGLE_PROJECT_NUMBER` in `android/app/build.gradle`.
+- For iOS, look for `ONESIGNAL_APP_ID` in `ios/DiscoSingle/AppDelegate.m`. 
+- For Android, look for `DISCOSINGLE_ONESIGNAL_APP_ID` and `DISCOSINGLE_GOOGLE_PROJECT_NUMBER` in `android/app/build.gradle`. (You will get the Google Project Number while setting up OneSignal for your Android app.) 
 
-You should now be ready to build and test the app. Note that in iOS, Push Notifications can only be tested on a real device, but the OneSignal console will show any attempts to enable Push Notifications on a simulator.
+You should now be ready to build and test the app. Note that in iOS, Push Notifications can only be tested on a real device, but the OneSignal console will show attempts to enable Push Notifications from a simulator.
 
 ### Helpful Tools
 
@@ -70,7 +70,6 @@ yo rn-toolbox:assets --splash splash.png --ios
 #### Logo for login screen
 The logo file for the login screen is under `js/logo.png`. Replace it with your logo.  
 
-
 #### Android build using Gradle
 Follow the [official React Native](https://facebook.github.io/react-native/docs/signed-apk-android.html) instructions on generating a key and an APK for release. Then run
 ```
@@ -80,7 +79,8 @@ and find your release file under `android/app/build/outputs/apk/app-release.apk`
 
 #### Renaming your App
 
-You can rename the app using `react-native-rename`. This is necessary for Android, because you also need to change the bundle ID. Steps: 
+You can rename the app using `react-native-rename`. This is necessary for Android, because it's the only way to change the bundle ID. 
+
 ```
 npm install react-native-rename -g
 react-native-rename "NewName" -b com.yourco.yourappid
