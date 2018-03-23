@@ -135,6 +135,7 @@ class App extends React.Component {
         this._Manager
           .generateAuthURL()
           .then(authUrl => {
+            AsyncStorage.setItem('@Discourse.skipLogin', 'loginSkipped')
             this.setState({
               uri: authUrl,
               authError: '',
