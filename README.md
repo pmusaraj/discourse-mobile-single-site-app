@@ -43,7 +43,7 @@ You need to open an account at OneSignal to be able to send Push Notifications (
 
 - Add the [discourse-onesignal](https://github.com/pmusaraj/discourse-onesignal/) plugin to your Discourse instance and configure it: enable notifications, add your OneSignal App ID and the OneSignal REST API key.
 - In your Discourse settings, add your site's home URL to `allowed user api auth redirects` (the app will redirect to your home URL once the user authorizes access for the app in Discourse). 
-- And add the OneSignal API Endpoint `https://onesignal.com/api/v1/notifications` to `allowed user api push urls`.
+- ~And add the OneSignal API Endpoint `https://onesignal.com/api/v1/notifications` to `allowed user api push urls`.~ This step is no longer needed, because it causes Discourse to send a second request to OneSignal (which fails). If you have previously added this to your configuration, you should remove it once your app has been updated to include [this commit](https://github.com/pmusaraj/discourse-mobile-single-site-app/commit/c98ab1468ffb03030ff9793d17fe43af99d995a6).
 
 #### OneSignal updates to native code
 
@@ -101,6 +101,6 @@ A list of potential upcoming features (if interested to fund, please contact me 
 
 - reply directly to a Push Notification
 - ipad/tablet UI
-- inApp signup form
+- in-app signup form
 - ios: swipe to go back/forward
 - test and support logins via other services (app currently works with Facebook, Patreon, Linkedin)
