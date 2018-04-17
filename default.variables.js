@@ -15,6 +15,10 @@ global.appName = 'DiscoSingle'
 // Show login form on splash screen
 global.showLoginForm = true
 
+// OneSignal in-app focus behaviour
+// 0 = no notification, 1 = alert dialog with a message, 2 = regular notification (same as when app is not in focus)
+global.inAppNotification = 2
+
 // Styling variables
 global.bgColor = '#FFFFFF'
 global.textColor = '#333333'

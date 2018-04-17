@@ -6,6 +6,7 @@ import {  AsyncStorage, WebView, Keyboard, Dimensions,
 import OneSignal from 'react-native-onesignal';
 import SafariView from 'react-native-safari-view';
 import CookieManager from 'react-native-cookies';
+import DeviceInfo from 'react-native-device-info'
 
 import Manager from './Manager'
 import Authenticate from './Authenticate'
@@ -55,8 +56,8 @@ class App extends React.Component {
       }).done(done => {
         AsyncStorage.getItem('@Discourse.auth').then((json) => {
           if (json) {
-            var auth = JSON.parse(json)
-            if (auth.key && auth.push) {
+            let auth = JSON.parse(json)
+            if (auth.key) {
               this.setState({pushAuth: true})
             }
           }
@@ -72,11 +73,12 @@ class App extends React.Component {
   componentDidMount() {
     OneSignal.addEventListener('ids', this.onIds);
     OneSignal.addEventListener('opened', this._onOpened.bind(this))
+    OneSignal.inFocusDisplaying(global.inAppNotification)
+
     AppState.addEventListener('change', this._handleAppStateChange);
 
-    // Android only: disable display when user is in app, clear notifications
+    // Android only: clear notifications (badge count) when user is in app
     if (Platform.OS !== 'ios') {
-      OneSignal.inFocusDisplaying(0)
       OneSignal.clearOneSignalNotifications();
     }
 
@@ -445,7 +447,12 @@ class App extends React.Component {
       return false
 
     return (
-      <View style={{flex: 1, backgroundColor: global.bgColor}} onLayout={this._onLayout.bind(this)}>
+      <View style={{
+              flex: 1,
+              backgroundColor: global.bgColor,
+              paddingTop: (DeviceInfo.getModel() == 'iPhone X') ? 20: 0
+            }}
+            onLayout={this._onLayout.bind(this)}>
         {this.state.uri && this.state.skipLogin &&
           this.renderWebView()
         }

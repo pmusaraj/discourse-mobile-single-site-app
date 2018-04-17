@@ -1,6 +1,6 @@
 {
 	"name": "DiscoSingle",
-	"version": "1.2.0",
+	"version": "1.2.1",
 	"private": true,
 	"scripts": {
 		"start": "node node_modules/react-native/local-cli/cli.js start",
@@ -12,7 +12,7 @@
 		"react-native-cookies": "^3.2.0",
 		"react-native-device-info": "^0.13.0",
 		"react-native-key-pair": "git+https://github.com/samsaffron/react-native-key-pair.git",
-		"react-native-onesignal": "git+https://github.com/bbrcan/react-native-onesignal.git",
+		"react-native-onesignal": "^3.1.4",
 		"react-native-safari-view": "^2.1.0"
 	},
 	"devDependencies": {
