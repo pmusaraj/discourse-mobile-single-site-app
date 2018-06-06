@@ -230,27 +230,24 @@ class App extends React.Component {
       this.invokeAuthRedirect(event.url);
     }
 
-    // open device browser for external links
+    // open device browser for external links in Android
     if (event.url.indexOf(site) === -1 && !event.url.includes('oauth')) {
       this.webview.stopLoading();
       if (Platform.OS === 'android') {
         Linking.openURL(event.url);
-      } else {
-        SafariView.show({url: event.url});
       }
       return false;
     }
   }
-  // _onShouldStartLoadWithRequest(event) {
-  //   // _onShouldStartLoadWithRequest runs on iOS only
-  //   // open device browser for external links
-  //   if (Platform.OS === 'ios' && event.url.indexOf(site) === -1 && !event.url.includes('oauth')) {
-  //     SafariView.show({url: event.url});
-  //     return false;
-  //   }
-
-  //   return true
-  // }
+  _onShouldStartLoadWithRequest(event) {
+    // _onShouldStartLoadWithRequest runs on iOS only
+    // open device browser for external links
+    if (Platform.OS === 'ios' && event.url.indexOf(site) === -1 && !event.url.includes('oauth')) {
+      SafariView.show({url: event.url});
+      return false;
+    }
+    return true
+  }
   renderWebView() {
     return (
       <CustomWebView
@@ -269,7 +266,7 @@ class App extends React.Component {
           `if (typeof $ !== 'undefined') {$('.docked .d-header').css('transform', 'translate3d(0,0,0)');}`
         }
         onNavigationStateChange={this._onNavigationStateChange.bind(this)}
-        // onShouldStartLoadWithRequest={this._onShouldStartLoadWithRequest.bind(this)}
+        onShouldStartLoadWithRequest={this._onShouldStartLoadWithRequest.bind(this)}
       />
     );
   }
