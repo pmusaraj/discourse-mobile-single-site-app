@@ -248,6 +248,44 @@ class App extends React.Component {
     }
     return true
   }
+  _renderError(e1, e2, e3) {
+    return (
+      <View style={{alignItems: 'center', justifyContent: 'center'}}>
+        <Text style={{
+          color: global.textColor,
+          fontSize: 16,
+          paddingVertical: 10
+          }}>
+          {e1} ({e2})
+        </Text>
+        <Text style={{
+          color: global.textColor,
+          fontSize: 14
+          }}>
+          {e3}
+        </Text>
+        <TouchableHighlight 
+          style={{
+            backgroundColor: global.buttonColor,
+            paddingVertical: 10,
+            paddingHorizontal: 20,
+            borderRadius: 3,
+            marginTop: 50
+          }}
+          onPress={(e) => {this.webview.reload()}}
+        >
+          <Text style={{
+            color: "#FFF",
+            fontSize: 20,
+            alignItems: 'center'
+          }}>
+            Refresh
+          </Text>
+        </TouchableHighlight>
+
+      </View>
+    );
+  }
   renderWebView() {
     return (
       <CustomWebView
@@ -267,6 +305,7 @@ class App extends React.Component {
         }
         onNavigationStateChange={this._onNavigationStateChange.bind(this)}
         onShouldStartLoadWithRequest={this._onShouldStartLoadWithRequest.bind(this)}
+        renderError={this._renderError.bind(this)}
       />
     );
   }
