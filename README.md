@@ -1,11 +1,17 @@
 Discourse Mobile App for a Single Site (with support for Push Notifications)
 --- 
 
-Whitelisted iOS and Android app for a single Discourse site that supports Push Notifications via OneSignal. 
+Whitelisted iOS app for a single Discourse site that supports Push Notifications via OneSignal. 
 
 Built with React Native. Inspired by [DiscourseMobile](https://github.com/discourse/DiscourseMobile).
 
 For a demonstration check out SWAPD or TekInvestor on the App Store or Google Play. 
+
+### Do not use this for Android, use web notifications instead
+
+As of September 2018, this app's support for Android will be deprecated. There is now a better way to have notifications in Android from your Discourse site directly. In your Discourse instance, enable the `push notifications prompt` admin setting. This will now let users of your site in applicable browsers (incl. Chrome for Android) see a bar prompting them to enable notifications. And done!
+
+Android-specific instructions below are now outdated. 
 
 ### Getting Started
 
@@ -25,7 +31,6 @@ To run the app locally, try either one of these commands:
 
 ```
 react-native run-ios
-react-native run-android
 ```
 
 See the [React Native](https://facebook.github.io/react-native/docs/getting-started.html) docs for more details. 
