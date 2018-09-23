@@ -19,6 +19,9 @@ global.showLoginForm = true
 // 0 = no notification, 1 = alert dialog with a message, 2 = regular notification (same as when app is not in focus)
 global.inAppNotification = 2
 
+// URLs to load directly in app
+global.internalURLs = ['oauth']
+
 // Styling variables
 global.bgColor = '#FFFFFF'
 global.textColor = '#333333'
@@ -26,8 +29,11 @@ global.buttonColor = '#bb3c2b'
 global.introText = 'Welcome! Please log in or signup to get started. Make sure to authenticate the application in order to enable notifications.';
 global.loginText = 'Login'
 global.skipText = 'Skip'
-// if showLoginForm is disabled, the following two variables are used
+
+// if showLoginForm is disabled, the following variables are used
 global.primaryStartButtonText = 'Launch'
+global.primaryStartButtonTextColor = '#FFFFFF'
+global.primaryStartUrl = ''
 global.secondaryStartButtonText = ''
 
 global.connectText = 'Connect'

@@ -15,6 +15,11 @@ import CustomWebView from './CustomWebView';
 
 const site = 'https://' + global.siteDomain;
 
+function isValidUrl(s) {
+   var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
+   return regexp.test(s);
+}
+
 class App extends React.Component {
   constructor(props) {
     super(props)
@@ -161,16 +166,17 @@ class App extends React.Component {
   createAccount() {
     AsyncStorage.setItem('@Discourse.skipLogin', 'loginSkipped')
     this.setState({
-      uri: site + global.acctUrl,
+      uri: isValidUrl(global.acctUrl) ? global.acctUrl : site + global.acctUrl,
       authError: '',
       skipLogin: true
     })    
   }
 
-  loadLoginModal() {
+  primaryStartAction() {
     AsyncStorage.setItem('@Discourse.skipLogin', 'loginSkipped')
     this.setState({
-      uri: `${site}/login`,
+      uri: isValidUrl(global.primaryStartUrl) ? global.primaryStartUrl : site + global.primaryStartUrl,
+      authError: '',
       skipLogin: true
     })    
   }
@@ -178,7 +184,7 @@ class App extends React.Component {
   TOS() {
     AsyncStorage.setItem('@Discourse.skipLogin', 'loginSkipped')
     this.setState({
-      uri: site + global.TOSUrl,
+      uri: isValidUrl(global.TOSUrl) ? global.TOSUrl : site + global.TOSUrl,
       authError: '',
       skipLogin: true
     })    
@@ -211,7 +217,6 @@ class App extends React.Component {
     }
   }
   _onNavigationStateChange(event) {
-
     // only prompt to authorize Notifications if user is logged in to Discourse and doesn't have pushAuth enabled
     if (!event.loading && !this.state.pushAuth && !event.url.includes(`user-api-key`)) {
       CookieManager.get(site)
@@ -231,7 +236,9 @@ class App extends React.Component {
     }
 
     // open device browser for external links in Android
-    if (event.url.indexOf(site) === -1 && !event.url.includes('oauth')) {
+    const internalLink = global.internalURLs.some(v => event.url.includes(v));
+
+    if (event.url.indexOf(site) === -1 && !internalLink) {
       this.webview.stopLoading();
       if (Platform.OS === 'android') {
         Linking.openURL(event.url);
@@ -242,7 +249,11 @@ class App extends React.Component {
   _onShouldStartLoadWithRequest(event) {
     // _onShouldStartLoadWithRequest runs on iOS only
     // open device browser for external links
-    if (Platform.OS === 'ios' && event.url.indexOf(site) === -1 && !event.url.includes('oauth')) {
+    if (event.url.includes('about:')) {
+      return false;
+    }
+    const internalLink = global.internalURLs.some(v => event.url.includes(v));
+    if (Platform.OS === 'ios' && event.url.indexOf(site) === -1 && !internalLink) {
       SafariView.show({url: event.url});
       return false;
     }
@@ -295,7 +306,7 @@ class App extends React.Component {
         }}
         ref={(ref) => { this.webview = ref; }}
         source={{ uri: this.state.uri }}
-        startInLoadingState={true}
+        startInLoadingState={false}
         bounces={true}
         mixedContentMode='always'
         openNewWindowInWebView={true}
@@ -446,10 +457,10 @@ class App extends React.Component {
               paddingHorizontal: 20,
               borderRadius: 3
             }}
-            onPress={() => {this.skipWelcomeScreen()}}
+            onPress={() => {this.primaryStartAction()}}
           >
             <Text style={{
-              color: "#FFF",
+              color: global.primaryStartButtonTextColor,
               fontSize: 18,
               alignItems: 'center'
             }}>
@@ -464,7 +475,7 @@ class App extends React.Component {
             justifyContent: 'center'
           }}>
             <TouchableHighlight 
-              onPress={() => {this.loadLoginModal()}}
+              onPress={() => {this.createAccount()}}
               style={{
                 paddingVertical: 8,
                 paddingHorizontal: 20
@@ -568,7 +579,7 @@ class App extends React.Component {
         {(this.state.promptToConnect && this.state.skipLogin) && 
           <View style={{
             height: 50, 
-            backgroundColor: '#ebebeb', 
+            backgroundColor: global.bgColor,
             padding: 8, 
             position: 'absolute', 
             bottom: 0, 
