@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import {
-  AsyncStorage,
   Keyboard,
   Dimensions,
   Linking,
@@ -18,6 +17,7 @@ import {
 
 import OneSignal from 'react-native-onesignal';
 import {WebView} from 'react-native-webview';
+import AsyncStorage from '@react-native-community/async-storage';
 
 // import CookieManager from 'react-native-cookies';
 import DeviceInfo from 'react-native-device-info';
@@ -245,23 +245,6 @@ class App extends React.Component {
     }
   }
   _onNavigationStateChange(event) {
-    // only prompt to authorize Notifications if user is logged in to Discourse and doesn't have pushAuth enabled
-    if (
-      !event.loading &&
-      !this.state.pushAuth &&
-      !event.url.includes(`user-api-key`)
-    ) {
-      // CookieManager.get(site).then(res => {
-      //   if (res._t && res._forum_session) {
-      //     this.setState({promptToConnect: true});
-      //   } else {
-      //     this.setState({promptToConnect: false});
-      //   }
-      // });
-    } else {
-      this.setState({promptToConnect: false});
-    }
-
     if (event.loading && event.url.includes(`?payload=`)) {
       this.invokeAuthRedirect(event.url);
     }
@@ -277,6 +260,18 @@ class App extends React.Component {
       return false;
     }
   }
+  _handleMessage(event) {
+    let data = JSON.parse(event.nativeEvent.data);
+    console.log('_onMessage', data);
+
+    if (data.authenticated !== undefined) {
+      if (this.state.pushAuth) {
+        this.setState({promptToConnect: false});
+      } else {
+        this.setState({promptToConnect: true});
+      }
+    }
+  }
   _onShouldStartLoadWithRequest(event) {
     // _onShouldStartLoadWithRequest runs on iOS only
     // open device browser for external links
@@ -284,10 +279,12 @@ class App extends React.Component {
       return false;
     }
     const internalLink = global.internalURLs.some(v => event.url.includes(v));
+    const fileDownload = ['.pdf'].some(v => event.url.includes(v));
+
     if (
-      Platform.OS === 'ios' &&
-      event.url.indexOf(site) === -1 &&
-      !internalLink
+      (Platform.OS === 'ios' &&
+        (event.url.indexOf(site) === -1 && !internalLink)) ||
+      fileDownload
     ) {
       Linking.openURL(event.url);
       return false;
@@ -349,12 +346,10 @@ class App extends React.Component {
         startInLoadingState={false}
         bounces={true}
         mixedContentMode="always"
-        openNewWindowInWebView={true}
-        injectedJavaScript={
-          // fixes issue with fixed-positioned header not showing up on initial load
-          `if (typeof $ !== 'undefined') {$('.docked .d-header').css('transform', 'translate3d(0,0,0)');}`
-        }
+        sharedCookiesEnabled={true}
+        allowsBackForwardNavigationGestures={true}
         onNavigationStateChange={this._onNavigationStateChange.bind(this)}
+        onMessage={e => this._handleMessage(e)}
         onShouldStartLoadWithRequest={this._onShouldStartLoadWithRequest.bind(
           this,
         )}
