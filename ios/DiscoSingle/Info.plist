@@ -17,7 +17,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0</string>
+	<string>1.5</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
@@ -39,8 +39,10 @@
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>Upload images from your camera.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Share location data even when in background.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string>Share location data when in use.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Upload images from your photo library.</string>
 	<key>UIBackgroundModes</key>

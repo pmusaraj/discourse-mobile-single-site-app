@@ -13,13 +13,13 @@ import {
   Image,
   AppState,
   BackHandler,
+  Share,
 } from 'react-native';
 
 import OneSignal from 'react-native-onesignal';
 import {WebView} from 'react-native-webview';
 import AsyncStorage from '@react-native-community/async-storage';
 
-// import CookieManager from 'react-native-cookies';
 import DeviceInfo from 'react-native-device-info';
 
 import Manager from './Manager';
@@ -122,6 +122,16 @@ class App extends React.Component {
       'hardwareBackPress',
       this._backHandler.bind(this),
     );
+
+    this._dimensionsChanged();
+    Dimensions.addEventListener('change', () => {
+      this._dimensionsChanged();
+    });
+  }
+
+  _dimensionsChanged() {
+    const {width, height} = Dimensions.get('window');
+    this.setState({landscapeLayout: width > height});
   }
 
   componentWillUnmount() {
@@ -232,10 +242,6 @@ class App extends React.Component {
   _keyboardDidHide(e) {
     this.setState({keyboardVisible: false});
   }
-  _onLayout() {
-    const {width, height} = Dimensions.get('window');
-    if (width > height) this.setState({landscapeLayout: true});
-  }
   invokeAuthRedirect(url) {
     let split = url.split('payload=');
     if (split.length === 2) {
@@ -270,6 +276,12 @@ class App extends React.Component {
       } else {
         this.setState({promptToConnect: true});
       }
+    }
+
+    if (data.shareUrl !== undefined) {
+      Share.share({
+        url: data.shareUrl,
+      });
     }
   }
   _onShouldStartLoadWithRequest(event) {
@@ -337,7 +349,8 @@ class App extends React.Component {
       <WebView
         style={{
           marginBottom: this.state.promptToConnect ? 50 : 0,
-          marginTop: 20,
+          marginTop:
+            DeviceInfo.hasNotch() && !this.state.landscapeLayout ? 30 : 0,
         }}
         ref={ref => {
           this.webview = ref;
@@ -544,6 +557,7 @@ class App extends React.Component {
       </View>
     );
   }
+
   render() {
     if (this.state.appLoading) return false;
 
@@ -552,9 +566,7 @@ class App extends React.Component {
         style={{
           flex: 1,
           backgroundColor: global.bgColor,
-          paddingTop: DeviceInfo.getModel() == 'iPhone X' ? 20 : 0,
-        }}
-        onLayout={this._onLayout.bind(this)}>
+        }}>
         {this.state.uri && this.state.skipLogin && this.renderWebView()}
 
         {!this.state.skipLogin && (
