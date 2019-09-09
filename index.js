@@ -1,14 +1,12 @@
 /**
- * @flow
+ * @format
  */
 
-import {
-  AppRegistry
-} from 'react-native';
+import { AppRegistry } from "react-native";
 
-import './default.variables.js';
-import './app.variables.js';
+import "./default.variables.js";
+import "./app.variables.js";
 
-import App from './js/App';
+import App from "./js/App";
 
-AppRegistry.registerComponent('DiscoSingle', () => App);
+AppRegistry.registerComponent("DiscoSingle", () => App);
