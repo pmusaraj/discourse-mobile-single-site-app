@@ -15,19 +15,25 @@ Android-specific instructions below are now outdated.
 
 ### Getting Started
 
-Install React Native.
+1. Install React Native.
 ```
 npm install -g react-native-cli
 ```
 
-Within the repository folder, install your packages:
+2. Install your packages:
 ```
 npm install
 ```
 
-Copy the contents of `default.variables.js` to `app.variables.js` to set your app's variables (site URL, app name, colors, marketing text, etc.). 
+3. Copy the contents of `default.variables.js` to `app.variables.js` to set your app's variables (site URL, app name, colors, marketing text, etc.). 
 
-To run the app locally, try either one of these commands:
+4. In the `ios` folder (`cd ios`, run 
+```
+pod install
+```
+This will link the libraries in xCode. 
+
+5. To run the app locally use:
 
 ```
 react-native run-ios
@@ -97,6 +103,5 @@ After renaming the app, you need to manually edit some files in subfolders under
 
 ### Troubleshooting
 
-- If you are having a `ld: library not found for -lRNDeviceInfo-tvOS` error, try manually deleting `libRNDeviceInfo-tvOS.a` in Xcode -> [Your iOS build target] -> Build Phases -> Link Binary with Libraries.
 - Android file uploads may fail. The app uses https://github.com/dahjelle/react-native-android-webview-file-image-upload to enable file uploads in WebView, but it's not tested with all versions of Android.
 - If you have already checked out the project, and renamed the app, you may run into a variety of file conflicts if you pull updates. This is especially the case if the React Native version in the project has been updated. This is normal, and a better course of action is to check out a fresh copy, and reapply your changes and the rename. 
