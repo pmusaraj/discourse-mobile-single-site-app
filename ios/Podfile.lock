@@ -57,7 +57,7 @@ PODS:
     - React-cxxreact (= 0.60.5)
     - React-jsi (= 0.60.5)
   - React-jsinspector (0.60.5)
-  - react-native-key-pair (1.0.0):
+  - react-native-key-pair (1.1.0):
     - React
   - react-native-onesignal (3.3.2):
     - OneSignal (= 2.10.1)
@@ -193,7 +193,7 @@ SPEC CHECKSUMS:
   React-jsi: 4d8c9efb6312a9725b18d6fc818ffc103f60fec2
   React-jsiexecutor: 90ad2f9db09513fc763bc757fdc3c4ff8bde2a30
   React-jsinspector: e08662d1bf5b129a3d556eb9ea343a3f40353ae4
-  react-native-key-pair: 9cdd84f50e0a1f2e095e2d745a00d8c742643314
+  react-native-key-pair: 4d076872a695a686cea4e1afd0053da2811f7df9
   react-native-onesignal: 93d50629a3f38df9df81178280ce7e7da6c29f05
   react-native-webview: d4bce5544a9976e29001384169211242398e9b8c
   React-RCTActionSheet: b0f1ea83f4bf75fb966eae9bfc47b78c8d3efd90
