@@ -360,7 +360,7 @@ class App extends React.Component {
         style={{
           marginBottom: this.state.promptToConnect ? 50 : 0,
           marginTop:
-            DeviceInfo.hasNotch() && !this.state.landscapeLayout ? 30 : 0,
+            DeviceInfo.hasNotch() && !this.state.landscapeLayout ? 35 : 20,
         }}
         ref={ref => {
           this.webview = ref;
