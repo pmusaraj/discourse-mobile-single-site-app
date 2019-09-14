@@ -37,6 +37,7 @@ function isValidUrl(s) {
 class App extends React.Component {
   constructor(props) {
     super(props);
+    OneSignal.init(global.oneSignalAppId, {kOSSettingsKeyAutoPrompt: false});
 
     this.state = {
       uri: site,
@@ -185,6 +186,7 @@ class App extends React.Component {
         });
       })
       .catch(err => {
+        console.log(err);
         if (err.error) this.setState({authError: err.error});
         else this.setState({authError: 'Error: Could not login.'});
       })
@@ -285,13 +287,21 @@ class App extends React.Component {
     }
   }
   _onShouldStartLoadWithRequest(event) {
-    // _onShouldStartLoadWithRequest runs on iOS only
     // open device browser for external links
     if (event.url.includes('about:')) {
       return false;
     }
     const internalLink = global.internalURLs.some(v => event.url.includes(v));
     const fileDownload = ['.pdf'].some(v => event.url.includes(v));
+
+    // onShouldStartLoadWithRequest is sometimes triggered by ajax requests (ads, etc.)
+    // this is a workaround to avoid launching Safari for these events
+    if (
+      event.mainDocumentURL !== undefined &&
+      event.url !== event.mainDocumentURL
+    ) {
+      return true;
+    }
 
     if (
       (Platform.OS === 'ios' &&

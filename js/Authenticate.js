@@ -109,13 +109,11 @@ class Authenticate {
       password: password,
     };
 
-    console.log(this.serializeParams(data));
-
     return new Promise((resolve, reject) => {
-      let req = new Request(`${site}/session?${this.serializeParams(data)}`, {
+      let req = new Request(`${site}/session`, {
         headers: headers,
         method: 'POST',
-        data: data,
+        body: this.serializeParams(data),
       });
 
       this._currentFetch = fetch(req);
