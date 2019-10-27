@@ -25,8 +25,6 @@ import DeviceInfo from 'react-native-device-info';
 import Manager from './Manager';
 import Authenticate from './Authenticate';
 
-// import CustomWebView from './CustomWebView';
-
 const site = 'https://' + global.siteDomain;
 
 function isValidUrl(s) {
