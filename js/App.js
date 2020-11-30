@@ -56,7 +56,7 @@ class App extends React.Component {
   }
 
   loadDiscourseAuth() {
-    this._Manager.generateAuthURL().then(authUrl => {
+    this._Manager.generateAuthURL().then((authUrl) => {
       this.setState({uri: authUrl});
     });
   }
@@ -64,13 +64,13 @@ class App extends React.Component {
   checkAuthStatus() {
     this._Manager
       .getUserInfo()
-      .then(user => {
+      .then((user) => {
         if (user && user.username) this.setState({skipLogin: true});
       })
-      .catch(err => {})
-      .done(done => {
+      .catch((err) => {})
+      .done((done) => {
         AsyncStorage.getItem('@Discourse.auth')
-          .then(json => {
+          .then((json) => {
             if (json) {
               let auth = JSON.parse(json);
               if (auth.key) {
@@ -78,11 +78,11 @@ class App extends React.Component {
               }
             }
           })
-          .catch(err => {
+          .catch((err) => {
             console.log('.auth error');
             console.log(err);
           })
-          .done(done => {
+          .done((done) => {
             this.setState({appLoading: false});
           });
       });
@@ -100,7 +100,7 @@ class App extends React.Component {
       OneSignal.clearOneSignalNotifications();
     }
 
-    AsyncStorage.getItem('@Discourse.skipLogin').then(json => {
+    AsyncStorage.getItem('@Discourse.skipLogin').then((json) => {
       if (json && json === 'loginSkipped') {
         this.setState({skipLogin: true});
       }
@@ -148,7 +148,7 @@ class App extends React.Component {
     return true;
   };
 
-  _handleAppStateChange = nextAppState => {
+  _handleAppStateChange = (nextAppState) => {
     console.log('APPSTATE: ' + nextAppState);
     if (
       this.state.appState.match(/inactive|background/) &&
@@ -173,8 +173,8 @@ class App extends React.Component {
     self = this;
     this._Auth
       .login(this.state.username, this.state.password)
-      .then(json => {
-        this._Manager.generateAuthURL().then(authUrl => {
+      .then((json) => {
+        this._Manager.generateAuthURL().then((authUrl) => {
           AsyncStorage.setItem('@Discourse.skipLogin', 'loginSkipped');
           this.setState({
             uri: authUrl,
@@ -183,7 +183,7 @@ class App extends React.Component {
           });
         });
       })
-      .catch(err => {
+      .catch((err) => {
         console.log(err);
         if (err.error) this.setState({authError: err.error});
         else this.setState({authError: 'Error: Could not login.'});
@@ -256,7 +256,7 @@ class App extends React.Component {
     }
 
     // open device browser for external links in Android
-    const internalLink = global.internalURLs.some(v => event.url.includes(v));
+    const internalLink = global.internalURLs.some((v) => event.url.includes(v));
 
     if (event.url.indexOf(site) === -1 && !internalLink) {
       this.webview.stopLoading();
@@ -289,8 +289,8 @@ class App extends React.Component {
     if (event.url.includes('about:')) {
       return false;
     }
-    const internalLink = global.internalURLs.some(v => event.url.includes(v));
-    const fileDownload = ['.pdf'].some(v => event.url.includes(v));
+    const internalLink = global.internalURLs.some((v) => event.url.includes(v));
+    const fileDownload = ['.pdf'].some((v) => event.url.includes(v));
 
     // onShouldStartLoadWithRequest is sometimes triggered by ajax requests (ads, etc.)
     // this is a workaround to avoid launching Safari for these events
@@ -303,7 +303,8 @@ class App extends React.Component {
 
     if (
       (Platform.OS === 'ios' &&
-        (event.url.indexOf(site) === -1 && !internalLink)) ||
+        event.url.indexOf(site) === -1 &&
+        !internalLink) ||
       fileDownload
     ) {
       Linking.openURL(event.url);
@@ -337,7 +338,7 @@ class App extends React.Component {
             borderRadius: 3,
             marginTop: 50,
           }}
-          onPress={e => {
+          onPress={(e) => {
             this.webview.reload();
           }}>
           <Text
@@ -360,7 +361,7 @@ class App extends React.Component {
           marginTop:
             DeviceInfo.hasNotch() && !this.state.landscapeLayout ? 35 : 20,
         }}
-        ref={ref => {
+        ref={(ref) => {
           this.webview = ref;
         }}
         source={{uri: this.state.uri}}
@@ -370,7 +371,7 @@ class App extends React.Component {
         sharedCookiesEnabled={true}
         allowsBackForwardNavigationGestures={true}
         onNavigationStateChange={this._onNavigationStateChange.bind(this)}
-        onMessage={e => this._handleMessage(e)}
+        onMessage={(e) => this._handleMessage(e)}
         onShouldStartLoadWithRequest={this._onShouldStartLoadWithRequest.bind(
           this,
         )}
@@ -399,7 +400,7 @@ class App extends React.Component {
               height: 36,
             }}
             underlineColorAndroid={global.textColor}
-            onChangeText={text => this.setState({username: text})}
+            onChangeText={(text) => this.setState({username: text})}
           />
         </View>
         <View style={{paddingVertical: 10}}>
@@ -418,10 +419,10 @@ class App extends React.Component {
               height: 36,
             }}
             underlineColorAndroid={global.textColor}
-            onSubmitEditing={e => {
+            onSubmitEditing={(e) => {
               this._userLogin(e);
             }}
-            onChangeText={text => this.setState({password: text})}
+            onChangeText={(text) => this.setState({password: text})}
           />
         </View>
         <View>
@@ -456,7 +457,7 @@ class App extends React.Component {
                 paddingHorizontal: 16,
                 borderRadius: 3,
               }}
-              onPress={e => {
+              onPress={(e) => {
                 this._userLogin(e);
               }}>
               <Text
@@ -582,7 +583,7 @@ class App extends React.Component {
             contentContainerStyle={{
               flex: 1,
               backgroundColor: global.bgColor,
-              padding: 15,
+              padding: 40,
               flexDirection: 'column',
               justifyContent: 'center',
               alignItems: 'stretch',
@@ -591,12 +592,12 @@ class App extends React.Component {
               <View
                 style={{
                   flex: 1,
-                  paddingVertical: this.state.keyboardVisible ? 6 : 15,
+                  paddingVertical: this.state.keyboardVisible ? 0 : 20,
                   alignItems: 'stretch',
                   paddingHorizontal: 20,
                 }}>
                 <Image
-                  source={require('./logo.png')}
+                  source={require('../icon.png')}
                   resizeMode={'contain'}
                   style={{width: null, height: null, flex: 1}}
                 />

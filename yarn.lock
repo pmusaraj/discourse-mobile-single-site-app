@@ -5765,10 +5765,10 @@ react-is@^16.12.0, react-is@^16.8.1, react-is@^16.8.4, react-is@^16.8.6:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.13.1.tgz#789729a4dc36de2999dc156dd6c1d9c18cea56a4"
   integrity sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==
 
-react-native-device-info@2.3.2:
-  version "2.3.2"
-  resolved "https://registry.yarnpkg.com/react-native-device-info/-/react-native-device-info-2.3.2.tgz#db2b8f135aaf2515583e367ab791dcc7d2f0d14c"
-  integrity sha512-ccpPuUbwhw5uYdVwN1UJp6ykMZz6U/u82HNM3oJ7O6MP8RIMlMDkHbqR4O0sDtUSuRMGiqqRzFtmOLFYeQ0ODw==
+react-native-device-info@7.2.0:
+  version "7.2.0"
+  resolved "https://registry.yarnpkg.com/react-native-device-info/-/react-native-device-info-7.2.0.tgz#9694f0bba4edd5842d6af13217019760f5ce058c"
+  integrity sha512-QEJ/6a+P309gzwxK2qIc5poD58N3oulDri+0L23pEjsMUV1V0CwuyBr+XvN1cJjCAi4C0dHUgvgwQE0hLi8cxQ==
 
 "react-native-key-pair@git+https://github.com/pmusaraj/react-native-key-pair.git":
   version "1.1.1"

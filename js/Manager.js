@@ -11,7 +11,7 @@ const site = 'https://' + global.siteDomain;
 
 class Manager {
   constructor() {
-    AsyncStorage.getItem('@Discourse.auth').then(json => {
+    AsyncStorage.getItem('@Discourse.auth').then((json) => {
       if (json) {
         var data = JSON.parse(json);
         if (data.key) {
@@ -20,7 +20,7 @@ class Manager {
       }
     });
 
-    AsyncStorage.getItem('@Discourse.clientId').then(clientId => {
+    AsyncStorage.getItem('@Discourse.clientId').then((clientId) => {
       this.clientId = clientId || this.randomBytes(16);
     });
   }
@@ -32,13 +32,13 @@ class Manager {
         return;
       }
 
-      AsyncStorage.getItem('@Discourse.rsaKeys').then(json => {
+      AsyncStorage.getItem('@Discourse.rsaKeys').then((json) => {
         if (json) {
           this.rsaKeys = JSON.parse(json);
           resolve();
         } else {
           console.log('Generating RSA keys');
-          RNKeyPair.generate(pair => {
+          RNKeyPair.generate((pair) => {
             this.rsaKeys = pair;
             console.log('Generated RSA keys');
             AsyncStorage.setItem(
@@ -66,19 +66,19 @@ class Manager {
     AsyncStorage.setItem('@Discourse.auth', JSON.stringify(decrypted));
     this.authToken = decrypted.key;
 
-    this.getUserInfo().then(user => {
+    this.getUserInfo().then((user) => {
       OneSignal.sendTag('username', user.username);
     });
   }
 
   serializeParams(obj) {
     return Object.keys(obj)
-      .map(k => `${encodeURIComponent(k)}=${encodeURIComponent([obj[k]])}`)
+      .map((k) => `${encodeURIComponent(k)}=${encodeURIComponent([obj[k]])}`)
       .join('&');
   }
 
   generateNonce() {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       this._nonce = this.randomBytes(16);
       resolve(this._nonce);
     });
@@ -87,14 +87,20 @@ class Manager {
   randomBytes(length) {
     return Array(length + 1)
       .join('x')
-      .replace(/x/g, c => {
+      .replace(/x/g, (c) => {
         return Math.floor(Math.random() * 16).toString(16);
       });
   }
 
   generateAuthURL() {
+    let deviceName = 'Unknown Device';
+
+    DeviceInfo.getDeviceName().then((name) => {
+      deviceName = name;
+    });
+
     return this.ensureRSAKeys().then(() =>
-      this.generateNonce().then(nonce => {
+      this.generateNonce().then((nonce) => {
         let basePushUrl = 'https://onesignal.com/api/v1/notifications';
         let params = {
           scopes: 'notifications,session_info',
@@ -102,12 +108,7 @@ class Manager {
           nonce: nonce,
           push_url: basePushUrl,
           auth_redirect: site,
-          application_name:
-            global.appName +
-            ' - ' +
-            (Platform.OS == 'android'
-              ? DeviceInfo.getModel()
-              : DeviceInfo.getDeviceName()),
+          application_name: global.appName + ' - ' + deviceName,
           public_key: this.rsaKeys.public,
         };
 
@@ -124,7 +125,7 @@ class Manager {
         resolve({userId: this.userId, username: this.username});
       } else {
         this.jsonApi('/session/current.json')
-          .then(json => {
+          .then((json) => {
             this.userId = json.current_user.id;
             this.username = json.current_user.username;
             resolve({
@@ -132,7 +133,7 @@ class Manager {
               username: this.username,
             });
           })
-          .catch(err => {
+          .catch((err) => {
             reject(err);
           })
           .done();
@@ -162,7 +163,7 @@ class Manager {
 
       this._currentFetch = fetch(req);
       this._currentFetch
-        .then(r1 => {
+        .then((r1) => {
           if (r1.status === 200) {
             return r1.json();
           } else {
@@ -173,10 +174,10 @@ class Manager {
             }
           }
         })
-        .then(result => {
+        .then((result) => {
           resolve(result);
         })
-        .catch(e => {
+        .catch((e) => {
           reject(e);
         })
         .finally(() => {

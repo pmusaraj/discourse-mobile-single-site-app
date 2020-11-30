@@ -13,7 +13,7 @@
 		"@react-native-community/async-storage": "1.6.1",
 		"react": "16.13.1",
 		"react-native": "0.63.3",
-		"react-native-device-info": "2.3.2",
+		"react-native-device-info": "7.2.0",
 		"react-native-key-pair": "git+https://github.com/pmusaraj/react-native-key-pair.git",
 		"react-native-onesignal": "3.3.2",
 		"react-native-webview": "^7.0.4"
