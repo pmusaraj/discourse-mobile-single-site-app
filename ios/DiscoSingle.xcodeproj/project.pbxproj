@@ -8,11 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
-		13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB11A68108700A75B9A /* LaunchScreen.xib */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		83FDE7CDF0D8446BAD0789B7 /* libRNDeviceInfo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5B69866DBF24426898812292 /* libRNDeviceInfo.a */; };
 		B8CCEB19086288F6111D1005 /* libPods-DiscoSingle.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C2B93489FDAD9C511D9605B /* libPods-DiscoSingle.a */; };
+		BD5E4EBD2574749200C684FC /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BD5E4EBC2574749200C684FC /* SplashScreen.storyboard */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -22,7 +22,6 @@
 		13B07F961A680F5B00A75B9A /* DiscoSingle.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DiscoSingle.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = DiscoSingle/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = DiscoSingle/AppDelegate.m; sourceTree = "<group>"; };
-		13B07FB21A68108700A75B9A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = DiscoSingle/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = DiscoSingle/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = DiscoSingle/main.m; sourceTree = "<group>"; };
@@ -37,6 +36,7 @@
 		B7080E7A84702A9DC5E089B3 /* Pods-DiscoSingle-DiscoSingleTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DiscoSingle-DiscoSingleTests.release.xcconfig"; path = "Target Support Files/Pods-DiscoSingle-DiscoSingleTests/Pods-DiscoSingle-DiscoSingleTests.release.xcconfig"; sourceTree = "<group>"; };
 		BD1FEB562566264100BCB56D /* DiscoSingle-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "DiscoSingle-Bridging-Header.h"; sourceTree = "<group>"; };
 		BD1FEB572566264100BCB56D /* DiscoSingle-tvOS-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "DiscoSingle-tvOS-Bridging-Header.h"; sourceTree = "<group>"; };
+		BD5E4EBC2574749200C684FC /* SplashScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = SplashScreen.storyboard; sourceTree = "<group>"; };
 		BDBC37C2200BA1D700B6B8EE /* DiscoSingle.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = DiscoSingle.entitlements; path = DiscoSingle/DiscoSingle.entitlements; sourceTree = "<group>"; };
 		D66657658A1D12BFCAA32261 /* Pods-DiscoSingle.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DiscoSingle.debug.xcconfig"; path = "Target Support Files/Pods-DiscoSingle/Pods-DiscoSingle.debug.xcconfig"; sourceTree = "<group>"; };
 		E4B44981A1681F1D7E5D55AF /* Pods-DiscoSingleTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DiscoSingleTests.debug.xcconfig"; path = "Target Support Files/Pods-DiscoSingleTests/Pods-DiscoSingleTests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -82,7 +82,6 @@
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
-				13B07FB11A68108700A75B9A /* LaunchScreen.xib */,
 				13B07FB71A68108700A75B9A /* main.m */,
 				BD1FEB562566264100BCB56D /* DiscoSingle-Bridging-Header.h */,
 				BD1FEB572566264100BCB56D /* DiscoSingle-tvOS-Bridging-Header.h */,
@@ -123,6 +122,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				BD5E4EBC2574749200C684FC /* SplashScreen.storyboard */,
 				13B07FAE1A68108700A75B9A /* DiscoSingle */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* DiscoSingleTests */,
@@ -224,7 +224,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
-				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
+				BD5E4EBD2574749200C684FC /* SplashScreen.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -299,18 +299,6 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
-/* Begin PBXVariantGroup section */
-		13B07FB11A68108700A75B9A /* LaunchScreen.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				13B07FB21A68108700A75B9A /* Base */,
-			);
-			name = LaunchScreen.xib;
-			path = DiscoSingle;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
-
 /* Begin XCBuildConfiguration section */
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -371,7 +359,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.discosingle;
 				PRODUCT_NAME = DiscoSingle;
-				PROVISIONING_PROFILE_SPECIFIER = "";
+				PROVISIONING_PROFILE_SPECIFIER = "match AppStore com.discosingle";
 				SWIFT_OBJC_BRIDGING_HEADER = "DiscoSingle-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
