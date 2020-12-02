@@ -8,7 +8,6 @@ import OneSignal from 'react-native-onesignal';
 import JSEncrypt from './lib/jsencrypt';
 
 const site = 'https://' + global.siteDomain;
-
 class Manager {
   constructor() {
     AsyncStorage.getItem('@Discourse.auth').then((json) => {

@@ -14,6 +14,7 @@ import {
   AppState,
   BackHandler,
   Share,
+  StatusBar,
 } from 'react-native';
 
 import OneSignal from 'react-native-onesignal';
@@ -24,6 +25,7 @@ import DeviceInfo from 'react-native-device-info';
 
 import Manager from './Manager';
 import Authenticate from './Authenticate';
+import TinyColor from './lib/tinycolor';
 
 const site = 'https://' + global.siteDomain;
 
@@ -49,6 +51,7 @@ class App extends React.Component {
       landscapeLayout: false,
       appState: AppState.currentState,
       pushAuth: false,
+      barStyle: 'default',
     };
 
     this._Manager = new Manager();
@@ -170,7 +173,6 @@ class App extends React.Component {
 
   _userLogin() {
     console.log('user login called');
-    self = this;
     this._Auth
       .login(this.state.username, this.state.password)
       .then((json) => {
@@ -283,6 +285,27 @@ class App extends React.Component {
         url: data.shareUrl,
       });
     }
+
+    if (data.headerBg) {
+      // when fully transparent, use black status bar
+      if (TinyColor(data.headerBg).getAlpha() === 0) {
+        data.headerBg = 'rgb(0,0,0)';
+      }
+
+      this.setState({
+        headerBg: data.headerBg,
+        barStyle:
+          TinyColor(data.headerBg).getBrightness() < 125
+            ? 'light-content'
+            : 'dark-content',
+      });
+      // ugly hack for an outstanding react-native-webview issue with the statusbar
+      // https://github.com/react-native-community/react-native-webview/issues/735
+      console.log(this.state.barStyle);
+      setTimeout(() => {
+        StatusBar.setBarStyle(this.state.barStyle);
+      }, 400);
+    }
   }
   _onShouldStartLoadWithRequest(event) {
     // open device browser for external links
@@ -357,7 +380,11 @@ class App extends React.Component {
     return (
       <WebView
         style={{
-          marginBottom: this.state.promptToConnect ? 50 : 0,
+          marginBottom: this.state.promptToConnect
+            ? 50
+            : this.state.landscapeLayout
+            ? 10
+            : 25,
           marginTop:
             DeviceInfo.hasNotch() && !this.state.landscapeLayout ? 35 : 20,
         }}
@@ -386,6 +413,7 @@ class App extends React.Component {
         <View style={{paddingVertical: 10}}>
           <TextInput
             placeholder={global.usernamePlaceholder}
+            placeholderTextColor={global.textColor}
             autoCapitalize="none"
             autoCorrect={false}
             autoFocus={false}
@@ -397,7 +425,8 @@ class App extends React.Component {
               paddingVertical: 5,
               borderBottomWidth: Platform.OS === 'ios' ? 1 : 0,
               borderColor: global.buttonColor,
-              height: 36,
+              height: 40,
+              fontSize: 18,
             }}
             underlineColorAndroid={global.textColor}
             onChangeText={(text) => this.setState({username: text})}
@@ -406,6 +435,7 @@ class App extends React.Component {
         <View style={{paddingVertical: 10}}>
           <TextInput
             placeholder={global.passwordPlaceholder}
+            placeholderTextColor={global.textColor}
             autoCapitalize="none"
             autoCorrect={false}
             secureTextEntry={true}
@@ -416,7 +446,8 @@ class App extends React.Component {
               paddingVertical: 5,
               borderBottomWidth: Platform.OS === 'ios' ? 1 : 0,
               borderColor: global.buttonColor,
-              height: 36,
+              height: 40,
+              fontSize: 18,
             }}
             underlineColorAndroid={global.textColor}
             onSubmitEditing={(e) => {
@@ -574,7 +605,7 @@ class App extends React.Component {
       <View
         style={{
           flex: 1,
-          backgroundColor: global.bgColor,
+          backgroundColor: this.state.headerBg,
         }}>
         {this.state.uri && this.state.skipLogin && this.renderWebView()}
 
