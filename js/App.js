@@ -23,7 +23,6 @@ import AsyncStorage from '@react-native-community/async-storage';
 
 import DeviceInfo from 'react-native-device-info';
 
-import Manager from './Manager';
 import Authenticate from './Authenticate';
 import TinyColor from './lib/tinycolor';
 
@@ -41,58 +40,21 @@ class App extends React.Component {
 
     this.state = {
       uri: site,
-      promptToConnect: false,
       skipLogin: false,
-      appLoading: true,
       username: '',
       password: '',
       authError: '',
       keyboardVisible: false,
       landscapeLayout: false,
       appState: AppState.currentState,
-      pushAuth: false,
       barStyle: 'default',
     };
 
-    this._Manager = new Manager();
     this._Auth = new Authenticate();
   }
 
-  loadDiscourseAuth() {
-    this._Manager.generateAuthURL().then((authUrl) => {
-      this.setState({uri: authUrl});
-    });
-  }
-
-  checkAuthStatus() {
-    this._Manager
-      .getUserInfo()
-      .then((user) => {
-        if (user && user.username) this.setState({skipLogin: true});
-      })
-      .catch((err) => {})
-      .done((done) => {
-        AsyncStorage.getItem('@Discourse.auth')
-          .then((json) => {
-            if (json) {
-              let auth = JSON.parse(json);
-              if (auth.key) {
-                this.setState({pushAuth: true});
-              }
-            }
-          })
-          .catch((err) => {
-            console.log('.auth error');
-            console.log(err);
-          })
-          .done((done) => {
-            this.setState({appLoading: false});
-          });
-      });
-  }
-
   componentDidMount() {
-    OneSignal.addEventListener('ids', this.onIds);
+    OneSignal.registerForPushNotifications();
     OneSignal.addEventListener('opened', this._onOpened.bind(this));
     OneSignal.inFocusDisplaying(global.inAppNotification);
 
@@ -118,8 +80,6 @@ class App extends React.Component {
       this._keyboardDidHide.bind(this),
     );
 
-    this.checkAuthStatus();
-
     BackHandler.addEventListener(
       'hardwareBackPress',
       this._backHandler.bind(this),
@@ -137,7 +97,6 @@ class App extends React.Component {
   }
 
   componentWillUnmount() {
-    OneSignal.removeEventListener('ids', this.onIds);
     OneSignal.removeEventListener('opened', this._onOpened);
 
     this.keyboardDidShowListener.remove();
@@ -164,26 +123,16 @@ class App extends React.Component {
     this.setState({appState: nextAppState});
   };
 
-  onIds(device) {
-    // TODO: should this be handled differently?
-    if (device.userId) {
-      AsyncStorage.setItem('@Discourse.clientId', device.userId);
-    }
-  }
-
   _userLogin() {
     console.log('user login called');
     this._Auth
       .login(this.state.username, this.state.password)
       .then((json) => {
-        this._Manager.generateAuthURL().then((authUrl) => {
-          AsyncStorage.setItem('@Discourse.skipLogin', 'loginSkipped');
-          this.setState({
-            uri: authUrl,
-            authError: '',
-            skipLogin: true,
-          });
+        this.setState({
+          authError: '',
+          skipLogin: true,
         });
+        AsyncStorage.setItem('@Discourse.skipLogin', 'loginSkipped');
       })
       .catch((err) => {
         console.log(err);
@@ -244,19 +193,7 @@ class App extends React.Component {
   _keyboardDidHide(e) {
     this.setState({keyboardVisible: false});
   }
-  invokeAuthRedirect(url) {
-    let split = url.split('payload=');
-    if (split.length === 2) {
-      OneSignal.registerForPushNotifications();
-      this._Manager.handleAuthPayload(decodeURIComponent(split[1]));
-      this.checkAuthStatus();
-    }
-  }
   _onNavigationStateChange(event) {
-    if (event.loading && event.url.includes(`?payload=`)) {
-      this.invokeAuthRedirect(event.url);
-    }
-
     // open device browser for external links in Android
     const internalLink = global.internalURLs.some((v) => event.url.includes(v));
 
@@ -272,12 +209,9 @@ class App extends React.Component {
     let data = JSON.parse(event.nativeEvent.data);
     console.log('_onMessage', data);
 
-    if (data.authenticated !== undefined) {
-      if (this.state.pushAuth) {
-        this.setState({promptToConnect: false});
-      } else {
-        this.setState({promptToConnect: true});
-      }
+    if (data.currentUsername) {
+      this._sendSubscription();
+      OneSignal.sendTag('username', data.currentUsername);
     }
 
     if (data.shareUrl !== undefined) {
@@ -301,12 +235,24 @@ class App extends React.Component {
       });
       // ugly hack for an outstanding react-native-webview issue with the statusbar
       // https://github.com/react-native-community/react-native-webview/issues/735
-      console.log(this.state.barStyle);
       setTimeout(() => {
         StatusBar.setBarStyle(this.state.barStyle);
       }, 400);
     }
   }
+
+  _sendSubscription() {
+    // send subscription request to discourse-onesignal
+    const sub = `
+      window.DiscourseOnesignal.subscribeDeviceToken("${DeviceInfo.getUniqueId()}", "${
+      Platform.OS
+    }", "${global.appName}");
+      true;
+    `;
+
+    this.webview.injectJavaScript(sub);
+  }
+
   _onShouldStartLoadWithRequest(event) {
     // open device browser for external links
     if (event.url.includes('about:')) {
@@ -337,11 +283,17 @@ class App extends React.Component {
   }
   _renderError(e1, e2, e3) {
     return (
-      <View style={{alignItems: 'center', justifyContent: 'center'}}>
+      <View
+        style={{
+          alignItems: 'center',
+          justifyContent: 'center',
+          display: 'flex',
+          height: '100%',
+        }}>
         <Text
           style={{
             color: global.textColor,
-            fontSize: 16,
+            fontSize: 18,
             paddingVertical: 10,
           }}>
           {e1} ({e2})
@@ -380,11 +332,7 @@ class App extends React.Component {
     return (
       <WebView
         style={{
-          marginBottom: this.state.promptToConnect
-            ? 50
-            : this.state.landscapeLayout
-            ? 10
-            : 25,
+          marginBottom: this.state.landscapeLayout ? 10 : 25,
           marginTop:
             DeviceInfo.hasNotch() && !this.state.landscapeLayout ? 35 : 20,
         }}
@@ -599,8 +547,6 @@ class App extends React.Component {
   }
 
   render() {
-    if (this.state.appLoading) return false;
-
     return (
       <View
         style={{
@@ -679,45 +625,6 @@ class App extends React.Component {
               </View>
             </View>
           </ScrollView>
-        )}
-
-        {this.state.promptToConnect && this.state.skipLogin && (
-          <View
-            style={{
-              height: 50,
-              backgroundColor: global.bgColor,
-              padding: 8,
-              position: 'absolute',
-              bottom: 0,
-              left: 0,
-              right: 0,
-              flex: 1,
-              flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <TouchableHighlight
-              style={{
-                backgroundColor: global.connectButtonBgColor,
-                height: 28,
-                padding: 4,
-                borderRadius: 2,
-              }}
-              onPress={() => {
-                this.loadDiscourseAuth();
-              }}>
-              <Text
-                style={{
-                  color: global.connectButtonTextColor,
-                  fontSize: 14,
-                  paddingLeft: 8,
-                  paddingRight: 8,
-                  fontFamily: 'HelveticaNeue-Medium',
-                }}>
-                {global.connectText}
-              </Text>
-            </TouchableHighlight>
-          </View>
         )}
       </View>
     );
