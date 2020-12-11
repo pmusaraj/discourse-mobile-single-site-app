@@ -68,6 +68,13 @@ class App extends React.Component {
     AsyncStorage.getItem('@Discourse.skipLogin').then((json) => {
       if (json && json === 'loginSkipped') {
         this.setState({skipLogin: true});
+      } else {
+        if (global.usePluginLoginScreen) {
+          this.setState({
+            uri: `${site}/onesignal/app-login`,
+            skipLogin: true,
+          });
+        }
       }
     });
 
@@ -212,6 +219,10 @@ class App extends React.Component {
     if (data.currentUsername) {
       this._sendSubscription();
       OneSignal.sendTag('username', data.currentUsername);
+      AsyncStorage.setItem('@Discourse.skipLogin', 'loginSkipped');
+      this.setState({
+        skipLogin: true,
+      });
     }
 
     if (data.shareUrl !== undefined) {
@@ -336,11 +347,21 @@ class App extends React.Component {
           marginTop:
             DeviceInfo.hasNotch() && !this.state.landscapeLayout ? 35 : 20,
         }}
+        containerStyle={{
+          backgroundColor: global.bgColor,
+        }}
         ref={(ref) => {
           this.webview = ref;
         }}
         source={{uri: this.state.uri}}
-        startInLoadingState={false}
+        startInLoadingState={true}
+        renderLoading={() => {
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: global.bgColor,
+            }}></View>;
+        }}
         bounces={true}
         mixedContentMode="always"
         sharedCookiesEnabled={true}
@@ -555,7 +576,7 @@ class App extends React.Component {
         }}>
         {this.state.uri && this.state.skipLogin && this.renderWebView()}
 
-        {!this.state.skipLogin && (
+        {!this.state.skipLogin && !global.usePluginLoginScreen && (
           <ScrollView
             contentContainerStyle={{
               flex: 1,
