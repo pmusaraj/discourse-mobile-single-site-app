@@ -48,6 +48,7 @@ class App extends React.Component {
       landscapeLayout: false,
       appState: AppState.currentState,
       barStyle: 'default',
+      loadProgress: 0,
     };
 
     this._Auth = new Authenticate();
@@ -354,7 +355,33 @@ class App extends React.Component {
           this.webview = ref;
         }}
         source={{uri: this.state.uri}}
-        startInLoadingState={false}
+        startInLoadingState={true}
+        renderLoading={() => (
+          <View
+            style={{
+              backgroundColor: global.bgColor,
+              height: '100%',
+              flex: 0,
+              paddingLeft: 50,
+              paddingRight: 50,
+            }}>
+            <Image
+              source={require('../icon.png')}
+              resizeMode={'center'}
+              style={{
+                width: null,
+                height: null,
+                opacity: this.state.loadProgress * 0.8,
+                flex: 1,
+              }}
+            />
+          </View>
+        )}
+        onLoadProgress={({nativeEvent}) => {
+          this.setState({
+            loadProgress: nativeEvent.progress,
+          });
+        }}
         bounces={true}
         mixedContentMode="always"
         sharedCookiesEnabled={true}
