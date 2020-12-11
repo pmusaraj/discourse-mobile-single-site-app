@@ -16,7 +16,7 @@
 		"react-native-device-info": "7.2.0",
 		"react-native-key-pair": "git+https://github.com/pmusaraj/react-native-key-pair.git",
 		"react-native-onesignal": "3.3.2",
-		"react-native-webview": "^7.0.4"
+		"react-native-webview": "^11.0.2"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.8.4",

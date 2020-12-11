@@ -354,14 +354,7 @@ class App extends React.Component {
           this.webview = ref;
         }}
         source={{uri: this.state.uri}}
-        startInLoadingState={true}
-        renderLoading={() => {
-          <View
-            style={{
-              flex: 1,
-              backgroundColor: global.bgColor,
-            }}></View>;
-        }}
+        startInLoadingState={false}
         bounces={true}
         mixedContentMode="always"
         sharedCookiesEnabled={true}
