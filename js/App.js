@@ -49,6 +49,7 @@ class App extends React.Component {
       appState: AppState.currentState,
       barStyle: 'default',
       loadProgress: 0,
+      headerBg: global.bgColor,
     };
 
     this._Auth = new Authenticate();
@@ -349,7 +350,7 @@ class App extends React.Component {
             DeviceInfo.hasNotch() && !this.state.landscapeLayout ? 35 : 20,
         }}
         containerStyle={{
-          backgroundColor: global.bgColor,
+          backgroundColor: this.state.headerBg,
         }}
         ref={(ref) => {
           this.webview = ref;
@@ -359,7 +360,7 @@ class App extends React.Component {
         renderLoading={() => (
           <View
             style={{
-              backgroundColor: global.bgColor,
+              backgroundColor: this.state.headerBg,
               height: '100%',
               flex: 0,
               paddingLeft: 50,
