@@ -42,20 +42,17 @@ yarn-error.log
 buck-out/
 \.buckd/
 *.keystore
+!debug.keystore
 
 # fastlane
-#
-# It is recommended to not store the screenshots in the git repo. Instead, use fastlane to re-generate the
-# screenshots whenever they are needed.
-# For more information about the recommended setup visit:
-# https://docs.fastlane.tools/best-practices/source-control/
-
-*/fastlane/report.xml
-*/fastlane/Preview.html
-*/fastlane/screenshots
+fastlane/.env.*
+!fastlane/.env.default
+!fastlane/.env.example1
+fastlane/**/
+!fastlane/example1/
 
 # Bundle artifact
 *.jsbundle
-	
+
 # CocoaPods
 /ios/Pods/

@@ -1,0 +1,127 @@
+require 'fileutils'
+
+PROJECT_NAME = "DiscoSingle"
+WORKSPACE="./ios/DiscoSingle.xcworkspace"
+XCODEPROJ="./ios/DiscoSingle.xcodeproj"
+
+platform :ios do
+  before_all do |lane, options|
+    next if lane == :certificates
+
+    update_info_plist(
+      xcodeproj: XCODEPROJ,
+      scheme: PROJECT_NAME,
+      display_name: ENV['APP_DISPLAY_NAME']
+    )
+
+    update_app_identifier(
+      xcodeproj: XCODEPROJ,
+      plist_path: "#{PROJECT_NAME}/Info.plist",
+      app_identifier: ENV["APP_IDENTIFIER"]
+    )
+
+    update_provisioning_profile_specifier(
+      xcodeproj: XCODEPROJ,
+      new_specifier: "match AppStore #{ENV["APP_IDENTIFIER"]}",
+      configuration: 'Release'
+    )
+
+    next if lane == :install || lane == :prep
+
+    increment_build_number(xcodeproj: XCODEPROJ)
+		match(app_identifier: ENV['APP_IDENTIFIER'], type: "appstore", api_key_path: "fastlane/#{ENV['VARIANT']}/key.json")
+  end
+
+  desc "Generate certificates"
+  lane :certificates do
+    match(app_identifier: ENV['APP_IDENTIFIER'], type: "appstore", api_key_path: "fastlane/#{ENV['VARIANT']}/key.json")
+  end
+
+  desc "Submit a new build to Testflight"
+	lane :release do
+	  gym(scheme: PROJECT_NAME, workspace: WORKSPACE, codesigning_identity: ENV["CODESIGNING_IDENTITY"])
+	  testflight(api_key_path: "fastlane/#{ENV['VARIANT']}/key.json")
+	end
+
+  desc "Install on connected device"
+  lane :install do
+    match(app_identifier: ENV['APP_IDENTIFIER'], type: "adhoc")
+	  gym(scheme: PROJECT_NAME, workspace: WORKSPACE, codesigning_identity: ENV["CODESIGNING_IDENTITY"])
+    install_on_device
+  end
+
+  desc "Prep iOS app"
+	lane :prep do
+    # only run through the before_all hook
+  end
+end
+
+platform :android do
+  desc "Build an APK for testing"
+  lane :apk do
+    increment_version_code(
+      gradle_file_path: "android/app/build.gradle"
+    )
+
+    gradle(
+      task: "assemble",
+      build_type: "Release",
+      project_dir: "android/"
+    )
+  end
+
+  desc "Generate a bundle for uploading to Google Play Store"
+  lane :release do
+    increment_version_code(
+      gradle_file_path: "android/app/build.gradle"
+    )
+
+    gradle(
+      task: "bundle",
+      build_type: "Release",
+      project_dir: "android/"
+    )
+  end
+end
+
+desc "Switch to environment"
+lane :switch do
+  Dir.chdir("..") do
+    FileUtils.cp "fastlane/#{ENV['VARIANT']}/app.variables.js", "app.variables.js"
+    FileUtils.cp "fastlane/#{ENV['VARIANT']}/icon.png", "icon.png"
+    FileUtils.cp "fastlane/#{ENV['VARIANT']}/splash.png", "splash.png"
+
+    system("react-native set-splash --platform ios --path fastlane/#{ENV['VARIANT']}/splash.png --background '#{ENV['BACKGROUND']}'")
+    system("react-native set-splash --platform android --path fastlane/#{ENV['VARIANT']}/splash.png --background '#{ENV['BACKGROUND']}'")
+    system("react-native set-icon --path fastlane/#{ENV['VARIANT']}/icon.png")
+  end
+
+
+  FileUtils.cp "#{ENV['VARIANT']}/android-release.keystore", "../android/app/release.keystore"
+
+  gradle_properties = <<TEMPLATE
+# Generated from `fastlane android bootstrap` do not edit or commit
+ANDROID_APP_ID=#{ENV['ANDROID_APP_ID']}
+MYAPP_RELEASE_STORE_FILE=release.keystore
+MYAPP_RELEASE_KEY_ALIAS=#{secrets["google_key_store_alias"]}
+MYAPP_RELEASE_STORE_PASSWORD=#{secrets["google_key_store_password"]}
+MYAPP_RELEASE_KEY_PASSWORD=#{secrets["google_key_store_password"]}
+android.useAndroidX=true
+android.enableJetifier=true
+FLIPPER_VERSION=0.54.0
+TEMPLATE
+
+  File.write(File.expand_path("../android/gradle.properties"), gradle_properties)
+
+  strings_xml = <<TEMPLATE
+<resources>
+    <string name="app_name">#{ENV['APP_DISPLAY_NAME']}</string>
+</resources>
+TEMPLATE
+
+  File.write(File.expand_path("../android/app/src/main/res/values/strings.xml"), strings_xml)
+end
+
+def secrets
+  @secrets ||= JSON.load(File.read("#{ENV['VARIANT']}/android-secrets.json"))
+end

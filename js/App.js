@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+
 import {
   Keyboard,
   Dimensions,
@@ -14,6 +15,7 @@ import {
   AppState,
   BackHandler,
   Share,
+  StatusBar,
 } from 'react-native';
 
 import OneSignal from 'react-native-onesignal';
@@ -22,8 +24,8 @@ import AsyncStorage from '@react-native-community/async-storage';
 
 import DeviceInfo from 'react-native-device-info';
 
-import Manager from './Manager';
 import Authenticate from './Authenticate';
+import TinyColor from './lib/tinycolor';
 
 const site = 'https://' + global.siteDomain;
 
@@ -39,57 +41,23 @@ class App extends React.Component {
 
     this.state = {
       uri: site,
-      promptToConnect: false,
       skipLogin: false,
-      appLoading: true,
       username: '',
       password: '',
       authError: '',
       keyboardVisible: false,
       landscapeLayout: false,
       appState: AppState.currentState,
-      pushAuth: false,
+      barStyle: 'default',
+      loadProgress: 0,
+      headerBg: global.bgColor,
     };
 
-    this._Manager = new Manager();
     this._Auth = new Authenticate();
   }
 
-  loadDiscourseAuth() {
-    this._Manager.generateAuthURL().then(authUrl => {
-      this.setState({uri: authUrl});
-    });
-  }
-
-  checkAuthStatus() {
-    this._Manager
-      .getUserInfo()
-      .then(user => {
-        if (user && user.username) this.setState({skipLogin: true});
-      })
-      .catch(err => {})
-      .done(done => {
-        AsyncStorage.getItem('@Discourse.auth')
-          .then(json => {
-            if (json) {
-              let auth = JSON.parse(json);
-              if (auth.key) {
-                this.setState({pushAuth: true});
-              }
-            }
-          })
-          .catch(err => {
-            console.log('.auth error');
-            console.log(err);
-          })
-          .done(done => {
-            this.setState({appLoading: false});
-          });
-      });
-  }
-
   componentDidMount() {
-    OneSignal.addEventListener('ids', this.onIds);
+    OneSignal.registerForPushNotifications();
     OneSignal.addEventListener('opened', this._onOpened.bind(this));
     OneSignal.inFocusDisplaying(global.inAppNotification);
 
@@ -100,9 +68,16 @@ class App extends React.Component {
       OneSignal.clearOneSignalNotifications();
     }
 
-    AsyncStorage.getItem('@Discourse.skipLogin').then(json => {
+    AsyncStorage.getItem('@Discourse.skipLogin').then((json) => {
       if (json && json === 'loginSkipped') {
         this.setState({skipLogin: true});
+      } else {
+        if (global.usePluginLoginScreen) {
+          this.setState({
+            uri: `${site}/onesignal/app-login`,
+            skipLogin: true,
+          });
+        }
       }
     });
 
@@ -115,8 +90,6 @@ class App extends React.Component {
       this._keyboardDidHide.bind(this),
     );
 
-    this.checkAuthStatus();
-
     BackHandler.addEventListener(
       'hardwareBackPress',
       this._backHandler.bind(this),
@@ -126,6 +99,15 @@ class App extends React.Component {
     Dimensions.addEventListener('change', () => {
       this._dimensionsChanged();
     });
+
+    if (Platform.OS !== 'ios') {
+      StatusBar.setBackgroundColor(this.state.headerBg);
+      const style =
+        TinyColor(this.state.headerBg).getBrightness() < 125
+          ? 'light-content'
+          : 'dark-content';
+      StatusBar.setBarStyle(style);
+    }
   }
 
   _dimensionsChanged() {
@@ -134,7 +116,6 @@ class App extends React.Component {
   }
 
   componentWillUnmount() {
-    OneSignal.removeEventListener('ids', this.onIds);
     OneSignal.removeEventListener('opened', this._onOpened);
 
     this.keyboardDidShowListener.remove();
@@ -148,7 +129,7 @@ class App extends React.Component {
     return true;
   };
 
-  _handleAppStateChange = nextAppState => {
+  _handleAppStateChange = (nextAppState) => {
     console.log('APPSTATE: ' + nextAppState);
     if (
       this.state.appState.match(/inactive|background/) &&
@@ -161,29 +142,18 @@ class App extends React.Component {
     this.setState({appState: nextAppState});
   };
 
-  onIds(device) {
-    // TODO: should this be handled differently?
-    if (device.userId) {
-      AsyncStorage.setItem('@Discourse.clientId', device.userId);
-    }
-  }
-
   _userLogin() {
     console.log('user login called');
-    self = this;
     this._Auth
       .login(this.state.username, this.state.password)
-      .then(json => {
-        this._Manager.generateAuthURL().then(authUrl => {
-          AsyncStorage.setItem('@Discourse.skipLogin', 'loginSkipped');
-          this.setState({
-            uri: authUrl,
-            authError: '',
-            skipLogin: true,
-          });
+      .then((json) => {
+        this.setState({
+          authError: '',
+          skipLogin: true,
         });
+        AsyncStorage.setItem('@Discourse.skipLogin', 'loginSkipped');
       })
-      .catch(err => {
+      .catch((err) => {
         console.log(err);
         if (err.error) this.setState({authError: err.error});
         else this.setState({authError: 'Error: Could not login.'});
@@ -242,21 +212,9 @@ class App extends React.Component {
   _keyboardDidHide(e) {
     this.setState({keyboardVisible: false});
   }
-  invokeAuthRedirect(url) {
-    let split = url.split('payload=');
-    if (split.length === 2) {
-      OneSignal.registerForPushNotifications();
-      this._Manager.handleAuthPayload(decodeURIComponent(split[1]));
-      this.checkAuthStatus();
-    }
-  }
   _onNavigationStateChange(event) {
-    if (event.loading && event.url.includes(`?payload=`)) {
-      this.invokeAuthRedirect(event.url);
-    }
-
     // open device browser for external links in Android
-    const internalLink = global.internalURLs.some(v => event.url.includes(v));
+    const internalLink = global.internalURLs.some((v) => event.url.includes(v));
 
     if (event.url.indexOf(site) === -1 && !internalLink) {
       this.webview.stopLoading();
@@ -270,12 +228,13 @@ class App extends React.Component {
     let data = JSON.parse(event.nativeEvent.data);
     console.log('_onMessage', data);
 
-    if (data.authenticated !== undefined) {
-      if (this.state.pushAuth) {
-        this.setState({promptToConnect: false});
-      } else {
-        this.setState({promptToConnect: true});
-      }
+    if (data.currentUsername) {
+      this._sendSubscription();
+      OneSignal.sendTag('username', data.currentUsername);
+      AsyncStorage.setItem('@Discourse.skipLogin', 'loginSkipped');
+      this.setState({
+        skipLogin: true,
+      });
     }
 
     if (data.shareUrl !== undefined) {
@@ -283,14 +242,50 @@ class App extends React.Component {
         url: data.shareUrl,
       });
     }
+
+    if (data.headerBg) {
+      // when fully transparent, use black status bar
+      if (TinyColor(data.headerBg).getAlpha() === 0) {
+        data.headerBg = 'rgb(0,0,0)';
+      }
+
+      this.setState({
+        headerBg: data.headerBg,
+        barStyle:
+          TinyColor(data.headerBg).getBrightness() < 125
+            ? 'light-content'
+            : 'dark-content',
+      });
+      // ugly hack for an outstanding react-native-webview issue with the statusbar
+      // https://github.com/react-native-community/react-native-webview/issues/735
+      setTimeout(() => {
+        StatusBar.setBarStyle(this.state.barStyle);
+        if (Platform.OS !== 'ios') {
+          StatusBar.setBackgroundColor(this.state.headerBg);
+        }
+      }, 400);
+    }
   }
+
+  _sendSubscription() {
+    // send subscription request to discourse-onesignal
+    const sub = `
+      window.DiscourseOnesignal.subscribeDeviceToken("${DeviceInfo.getUniqueId()}", "${
+      Platform.OS
+    }", "${global.appName}");
+      true;
+    `;
+
+    this.webview.injectJavaScript(sub);
+  }
+
   _onShouldStartLoadWithRequest(event) {
     // open device browser for external links
     if (event.url.includes('about:')) {
       return false;
     }
-    const internalLink = global.internalURLs.some(v => event.url.includes(v));
-    const fileDownload = ['.pdf'].some(v => event.url.includes(v));
+    const internalLink = global.internalURLs.some((v) => event.url.includes(v));
+    const fileDownload = ['.pdf'].some((v) => event.url.includes(v));
 
     // onShouldStartLoadWithRequest is sometimes triggered by ajax requests (ads, etc.)
     // this is a workaround to avoid launching Safari for these events
@@ -303,7 +298,8 @@ class App extends React.Component {
 
     if (
       (Platform.OS === 'ios' &&
-        (event.url.indexOf(site) === -1 && !internalLink)) ||
+        event.url.indexOf(site) === -1 &&
+        !internalLink) ||
       fileDownload
     ) {
       Linking.openURL(event.url);
@@ -313,11 +309,17 @@ class App extends React.Component {
   }
   _renderError(e1, e2, e3) {
     return (
-      <View style={{alignItems: 'center', justifyContent: 'center'}}>
+      <View
+        style={{
+          alignItems: 'center',
+          justifyContent: 'center',
+          display: 'flex',
+          height: '100%',
+        }}>
         <Text
           style={{
             color: global.textColor,
-            fontSize: 16,
+            fontSize: 18,
             paddingVertical: 10,
           }}>
           {e1} ({e2})
@@ -337,7 +339,7 @@ class App extends React.Component {
             borderRadius: 3,
             marginTop: 50,
           }}
-          onPress={e => {
+          onPress={(e) => {
             this.webview.reload();
           }}>
           <Text
@@ -356,21 +358,50 @@ class App extends React.Component {
     return (
       <WebView
         style={{
-          marginBottom: this.state.promptToConnect ? 50 : 0,
-          marginTop:
-            DeviceInfo.hasNotch() && !this.state.landscapeLayout ? 35 : 20,
+          backgroundColor: this.state.headerBg,
+          marginBottom: 0,
+          marginTop: this.state.landscapeLayout
+            ? 0
+            : DeviceInfo.hasNotch()
+            ? 35
+            : 0,
         }}
-        ref={ref => {
+        ref={(ref) => {
           this.webview = ref;
         }}
         source={{uri: this.state.uri}}
-        startInLoadingState={false}
+        startInLoadingState={true}
+        renderLoading={() => (
+          <View
+            style={{
+              backgroundColor: this.state.headerBg,
+              height: '100%',
+              justifyContent: 'center',
+              alignItems: 'center',
+              paddingLeft: 0,
+              paddingRight: 0,
+            }}>
+            <Image
+              source={require('../splash.png')}
+              resizeMode="cover"
+              style={{
+                width: '95%',
+                height: '95%',
+              }}
+            />
+          </View>
+        )}
+        onLoadProgress={({nativeEvent}) => {
+          this.setState({
+            loadProgress: nativeEvent.progress,
+          });
+        }}
         bounces={true}
         mixedContentMode="always"
         sharedCookiesEnabled={true}
         allowsBackForwardNavigationGestures={true}
         onNavigationStateChange={this._onNavigationStateChange.bind(this)}
-        onMessage={e => this._handleMessage(e)}
+        onMessage={(e) => this._handleMessage(e)}
         onShouldStartLoadWithRequest={this._onShouldStartLoadWithRequest.bind(
           this,
         )}
@@ -385,6 +416,7 @@ class App extends React.Component {
         <View style={{paddingVertical: 10}}>
           <TextInput
             placeholder={global.usernamePlaceholder}
+            placeholderTextColor={global.textColor}
             autoCapitalize="none"
             autoCorrect={false}
             autoFocus={false}
@@ -396,15 +428,17 @@ class App extends React.Component {
               paddingVertical: 5,
               borderBottomWidth: Platform.OS === 'ios' ? 1 : 0,
               borderColor: global.buttonColor,
-              height: 36,
+              height: 40,
+              fontSize: 18,
             }}
             underlineColorAndroid={global.textColor}
-            onChangeText={text => this.setState({username: text})}
+            onChangeText={(text) => this.setState({username: text})}
           />
         </View>
         <View style={{paddingVertical: 10}}>
           <TextInput
             placeholder={global.passwordPlaceholder}
+            placeholderTextColor={global.textColor}
             autoCapitalize="none"
             autoCorrect={false}
             secureTextEntry={true}
@@ -415,13 +449,14 @@ class App extends React.Component {
               paddingVertical: 5,
               borderBottomWidth: Platform.OS === 'ios' ? 1 : 0,
               borderColor: global.buttonColor,
-              height: 36,
+              height: 40,
+              fontSize: 18,
             }}
             underlineColorAndroid={global.textColor}
-            onSubmitEditing={e => {
+            onSubmitEditing={(e) => {
               this._userLogin(e);
             }}
-            onChangeText={text => this.setState({password: text})}
+            onChangeText={(text) => this.setState({password: text})}
           />
         </View>
         <View>
@@ -456,7 +491,7 @@ class App extends React.Component {
                 paddingHorizontal: 16,
                 borderRadius: 3,
               }}
-              onPress={e => {
+              onPress={(e) => {
                 this._userLogin(e);
               }}>
               <Text
@@ -567,22 +602,20 @@ class App extends React.Component {
   }
 
   render() {
-    if (this.state.appLoading) return false;
-
     return (
       <View
         style={{
           flex: 1,
-          backgroundColor: global.bgColor,
+          backgroundColor: this.state.headerBg,
         }}>
         {this.state.uri && this.state.skipLogin && this.renderWebView()}
 
-        {!this.state.skipLogin && (
+        {!this.state.skipLogin && !global.usePluginLoginScreen && (
           <ScrollView
             contentContainerStyle={{
               flex: 1,
               backgroundColor: global.bgColor,
-              padding: 15,
+              padding: 40,
               flexDirection: 'column',
               justifyContent: 'center',
               alignItems: 'stretch',
@@ -591,12 +624,12 @@ class App extends React.Component {
               <View
                 style={{
                   flex: 1,
-                  paddingVertical: this.state.keyboardVisible ? 6 : 15,
+                  paddingVertical: this.state.keyboardVisible ? 0 : 20,
                   alignItems: 'stretch',
                   paddingHorizontal: 20,
                 }}>
                 <Image
-                  source={require('./logo.png')}
+                  source={require('../icon.png')}
                   resizeMode={'contain'}
                   style={{width: null, height: null, flex: 1}}
                 />
@@ -647,45 +680,6 @@ class App extends React.Component {
               </View>
             </View>
           </ScrollView>
-        )}
-
-        {this.state.promptToConnect && this.state.skipLogin && (
-          <View
-            style={{
-              height: 50,
-              backgroundColor: global.bgColor,
-              padding: 8,
-              position: 'absolute',
-              bottom: 0,
-              left: 0,
-              right: 0,
-              flex: 1,
-              flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <TouchableHighlight
-              style={{
-                backgroundColor: global.connectButtonBgColor,
-                height: 28,
-                padding: 4,
-                borderRadius: 2,
-              }}
-              onPress={() => {
-                this.loadDiscourseAuth();
-              }}>
-              <Text
-                style={{
-                  color: global.connectButtonTextColor,
-                  fontSize: 14,
-                  paddingLeft: 8,
-                  paddingRight: 8,
-                  fontFamily: 'HelveticaNeue-Medium',
-                }}>
-                {global.connectText}
-              </Text>
-            </TouchableHighlight>
-          </View>
         )}
       </View>
     );
