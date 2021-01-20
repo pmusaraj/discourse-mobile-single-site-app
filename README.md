@@ -1,39 +1,29 @@
 ## Discourse Mobile App for a Single Site (with support for Push Notifications)
 
-Whitelisted iOS app for a single Discourse site that supports Push Notifications via OneSignal.
-
-Built with React Native. Inspired by [DiscourseMobile](https://github.com/discourse/DiscourseMobile).
+Whitelisted iOS/Android app for a single Discourse site that supports push notifications via OneSignal.
 
 For a demonstration check out SWAPD or TekInvestor on the App Store or Google Play.
-
-### Do not use this for Android, use web notifications instead
-
-As of September 2018, this app's support for Android will be deprecated. There is now a better way to have notifications in Android from your Discourse site directly. In your Discourse instance, enable the `push notifications prompt` admin setting. This will now let users of your site in applicable browsers (incl. Chrome for Android) see a bar prompting them to enable notifications. And done!
-
-Android-specific instructions below are now outdated.
 
 ### Getting Started
 
 1. Install your packages:
 
-```
+```bash
 yarn install
 ```
 
-2. Copy the contents of `default.variables.js` to `app.variables.js` to set your app's variables (site URL, app name, colors, marketing text, etc.).
+2. Link the iOS libraries via
 
-3. In the `ios` folder (`cd ios`, run
-
-```
-pod install
+```bash
+cd ios && pod install
 ```
 
-This will link the libraries in xCode.
+3. And run the app in the simulator using:
 
-4. To run the app locally use:
-
-```
+```bash
 react-native run-ios
+# or
+react-native run-android
 ```
 
 See the [React Native](https://facebook.github.io/react-native/docs/getting-started.html) docs for more details.
@@ -43,67 +33,59 @@ See the [React Native](https://facebook.github.io/react-native/docs/getting-star
 You need to open an account at OneSignal to be able to send Push Notifications (PNs) from your Discourse site, and receive them in the app. Steps:
 
 - Register an App ID on the Apple portal (developer.apple.com)
-- Open an account with [OneSignal](https://www.onesignal.com) (free), create a new app, and generate certificates for iOS and Android
-- Create the provisioning profiles on the Apple portal. You need a distribution profile for pushing to TestFlight and the App Store, and likely an ad-hoc profile for testing quickly on your device. (Note that you may also need a development certificate for testing the app on your device. Step 2 above creates only the production certificate.)
-- Create an iCloud container and associate it with your App ID.
-
-#### OneSignal Discourse Setup
-
+- Open an account with [OneSignal](https://www.onesignal.com) (free), create a new app, and generate certificates for iOS and Android (see Onesignal documentation for steps on each platform)
 - Add the [discourse-onesignal](https://github.com/pmusaraj/discourse-onesignal/) plugin to your Discourse instance and configure it: enable notifications, add your OneSignal App ID and the OneSignal REST API key.
-- In your Discourse settings, add your site's home URL to `allowed user api auth redirects` (the app will redirect to your home URL once the user authorizes access for the app in Discourse).
-- ~And add the OneSignal API Endpoint `https://onesignal.com/api/v1/notifications` to `allowed user api push urls`.~ This step is no longer needed, because it causes Discourse to send a second request to OneSignal (which fails). If you have previously added this to your configuration, you should remove it once your app has been updated to include [this commit](https://github.com/pmusaraj/discourse-mobile-single-site-app/commit/c98ab1468ffb03030ff9793d17fe43af99d995a6).
+- in your app's `app.variables.js` file, add the OneSignal App ID
 
-#### OneSignal updates to native code
+### Build and release using Fastlane
 
-In your app code for either iOS or Android, you need to replace the placeholder OneSignal App ID with your app's OneSignal App ID.
+To simplify managing your app and keeping up with changes in the repo, you can use the included Fastlane scripts.
 
-- For iOS, look for `ONESIGNAL_APP_ID` in `ios/DiscoSingle/AppDelegate.m`.
-- For Android, look for `DISCOSINGLE_ONESIGNAL_APP_ID` and `DISCOSINGLE_GOOGLE_PROJECT_NUMBER` in `android/app/build.gradle`. (You will get the Google Project Number while setting up OneSignal for your Android app.)
+#### Initial setup
 
-You should now be ready to build and test the app. Note that in iOS, Push Notifications can only be tested on a real device, but the OneSignal console will show attempts to enable Push Notifications from a simulator.
+- Create a private git repository that Fastlane's `match` script uses to generate and update your app's certificates.
+- Copy the `fastlane/example1` folder and the `.env.example1` file and rename them using your app's name (for this guide, we will assume the copied items are `fastlane/yourapp` and `.env.yourapp`).
+- Update the variables in the folder and the ENV file, as well as the logo.png and splash.png images.
+- **iOS**: Create an App Store Connect API Key and follow the instructions in https://docs.fastlane.tools/app-store-connect-api/, and update the `fastlane/yourapp/key.json` file with the key
+  details.
+- **Android**: generate or copy over your app's keystore and secrets in the respective files in `fastlane/yourapp`.
 
-### Helpful Tools
+You should now be ready to run Fastlane scripts for your app's environment. by appending `--env yourapp` to any Fastlane commands.
 
-#### Generating assets
-
-Use [generator-rn-toolbox](https://github.com/bamlab/generator-rn-toolbox) to setup icons and splash screens for the app:
-
-```
-npm install -g yo generator-rn-toolbox
-
-yo rn-toolbox:assets --icon icon.png
-yo rn-toolbox:assets --splash splash.png --android
-yo rn-toolbox:assets --splash splash.png --ios
-```
-
-#### Logo for login screen
-
-The logo file for the login screen is under `js/logo.png`. Replace it with your logo.
-
-#### Android build using Gradle
-
-Follow the [official React Native](https://facebook.github.io/react-native/docs/signed-apk-android.html) instructions on generating a key and an APK for release. Then run
+To update the app name and assets, run:
 
 ```
-cd android && ./gradlew assembleRelease
+cd fastlane
+fastlane switch --env yourapp
 ```
 
-and find your release file under `android/app/build/outputs/apk/app-release.apk`.
-
-#### Renaming your App
-
-You can rename the app using `react-native-rename`. This is necessary for Android, because it's the only way to change the bundle ID.
+To generate (or update) iOS certificates, run:
 
 ```
-npm install react-native-rename -g
-react-native-rename "NewName" -b com.yourco.yourappid
+cd fastlane
+fastlane ios certificates --env yourapp
 ```
 
-(The bundle name specified by `-b` above only applies to Android, to change your iOS bundle ID, use Xcode.)
+To build your app for iOS, run:
 
-After renaming the app, you need to manually edit some files in subfolders under `android/app/src/main/java`, and replace `com.discosingle;` at the beginning of every file with your new bundle ID. The rename script does it for `MainActivity.java` and `MainApplication.java`, you need to manually do this for the remaining files.
+```
+cd fastlane
+fastlane ios install --env yourapp
+# will install the app on a connected device or simulator
 
-### Troubleshooting
+fastlane ios release --env yourapp
+# will build and upload the app to TestFlight
 
-- Android file uploads may fail. The app uses https://github.com/dahjelle/react-native-android-webview-file-image-upload to enable file uploads in WebView, but it's not tested with all versions of Android.
-- If you have already checked out the project, and renamed the app, you may run into a variety of file conflicts if you pull updates. This is especially the case if the React Native version in the project has been updated. This is normal, and a better course of action is to check out a fresh copy, and reapply your changes and the rename.
+```
+
+To build your app for Android, run:
+
+```
+cd fastlane
+fastlane android apk --env yourapp
+# will build an apk in android/app/build/outputs/apk/
+
+fastlane android release --env yourapp
+# will create a bundle android/app/build/outputs/bundle/
+
+```

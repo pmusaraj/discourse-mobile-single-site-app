@@ -1,0 +1,4 @@
+git_url(ENV["GIT_URL"])
+
+# For all available options run `fastlane match --help`
+# The docs are available on https://docs.fastlane.tools/actions/match

@@ -1,0 +1,6 @@
+{
+  "key_id": "KEY-ID-APP-STORE-CONNECT",
+  "issuer_id": "ISSUER-ID-FROM-APP-STORE-CONNECT",
+  "key": "-----BEGIN PRIVATE KEY-----\nKEYSTRING\n-----END PRIVATE KEY-----",
+  "in_house": false
+}
