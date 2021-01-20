@@ -4,15 +4,5 @@
     
     
     
-      
-      <testcase classname="fastlane.lanes" name="0: increment_version_code" time="0.007223">
-        
-      </testcase>
-    
-      
-      <testcase classname="fastlane.lanes" name="1: bundleRelease" time="35.705627">
-        
-      </testcase>
-    
   </testsuite>
 </testsuites>

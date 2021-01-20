@@ -86,12 +86,13 @@ end
 
 desc "Switch to environment"
 lane :switch do
-  FileUtils.cp "#{ENV['VARIANT']}/app.variables.js", "../app.variables.js"
-  FileUtils.cp "#{ENV['VARIANT']}/icon.png", "../icon.png"
-  FileUtils.cp "#{ENV['VARIANT']}/splash.png", "../splash.png"
-
   Dir.chdir("..") do
+    FileUtils.cp "fastlane/#{ENV['VARIANT']}/app.variables.js", "app.variables.js"
+    FileUtils.cp "fastlane/#{ENV['VARIANT']}/icon.png", "icon.png"
+    FileUtils.cp "fastlane/#{ENV['VARIANT']}/splash.png", "splash.png"
+
     system("react-native set-splash --platform ios --path fastlane/#{ENV['VARIANT']}/splash.png --background '#{ENV['BACKGROUND']}'")
+    system("react-native set-splash --platform android --path fastlane/#{ENV['VARIANT']}/splash.png --background '#{ENV['BACKGROUND']}'")
     system("react-native set-icon --path fastlane/#{ENV['VARIANT']}/icon.png")
   end
 
