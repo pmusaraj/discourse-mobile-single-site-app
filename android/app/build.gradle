@@ -3,7 +3,7 @@ buildscript {
         maven { url 'https://plugins.gradle.org/m2/' } // Gradle Plugin Portal
     }
     dependencies {
-        classpath 'gradle.plugin.com.onesignal:onesignal-gradle-plugin:[0.12.1, 0.99.99]'
+        classpath 'gradle.plugin.com.onesignal:onesignal-gradle-plugin:[0.12.9, 0.99.99]'
     }
 }
 
@@ -141,10 +141,8 @@ android {
         applicationId ANDROID_APP_ID
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 26
+        versionCode 37
         versionName "1.6"
-        manifestPlaceholders = [onesignal_app_id: "DISCOSINGLE_ONESIGNAL_APP_ID",
-                                onesignal_google_project_number: "DISCOSINGLE_GOOGLE_PROJECT_NUMBER"]
         multiDexEnabled true
     }
     splits {

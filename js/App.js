@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+
 import {
   Keyboard,
   Dimensions,
@@ -98,6 +99,15 @@ class App extends React.Component {
     Dimensions.addEventListener('change', () => {
       this._dimensionsChanged();
     });
+
+    if (Platform.OS !== 'ios') {
+      StatusBar.setBackgroundColor(this.state.headerBg);
+      const style =
+        TinyColor(this.state.headerBg).getBrightness() < 125
+          ? 'light-content'
+          : 'dark-content';
+      StatusBar.setBarStyle(style);
+    }
   }
 
   _dimensionsChanged() {
@@ -250,6 +260,9 @@ class App extends React.Component {
       // https://github.com/react-native-community/react-native-webview/issues/735
       setTimeout(() => {
         StatusBar.setBarStyle(this.state.barStyle);
+        if (Platform.OS !== 'ios') {
+          StatusBar.setBackgroundColor(this.state.headerBg);
+        }
       }, 400);
     }
   }
@@ -345,12 +358,13 @@ class App extends React.Component {
     return (
       <WebView
         style={{
-          marginBottom: this.state.landscapeLayout ? 10 : 25,
-          marginTop:
-            DeviceInfo.hasNotch() && !this.state.landscapeLayout ? 35 : 20,
-        }}
-        containerStyle={{
           backgroundColor: this.state.headerBg,
+          marginBottom: 0,
+          marginTop: this.state.landscapeLayout
+            ? 0
+            : DeviceInfo.hasNotch()
+            ? 35
+            : 0,
         }}
         ref={(ref) => {
           this.webview = ref;
@@ -362,18 +376,17 @@ class App extends React.Component {
             style={{
               backgroundColor: this.state.headerBg,
               height: '100%',
-              flex: 0,
-              paddingLeft: 50,
-              paddingRight: 50,
+              justifyContent: 'center',
+              alignItems: 'center',
+              paddingLeft: 0,
+              paddingRight: 0,
             }}>
             <Image
-              source={require('../icon.png')}
-              resizeMode={'center'}
+              source={require('../splash.png')}
+              resizeMode="cover"
               style={{
-                width: null,
-                height: null,
-                opacity: this.state.loadProgress * 0.8,
-                flex: 1,
+                width: '95%',
+                height: '95%',
               }}
             />
           </View>
