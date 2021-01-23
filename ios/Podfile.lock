@@ -19,7 +19,7 @@ PODS:
     - DoubleConversion
     - glog
   - glog (0.3.5)
-  - OneSignal (2.10.1)
+  - OneSignal (2.16.1)
   - RCTRequired (0.63.3)
   - RCTTypeSafety (0.63.3):
     - FBLazyVector (= 0.63.3)
@@ -186,10 +186,8 @@ PODS:
     - React-cxxreact (= 0.63.3)
     - React-jsi (= 0.63.3)
   - React-jsinspector (0.63.3)
-  - react-native-key-pair (1.1.1):
-    - React
-  - react-native-onesignal (3.3.2):
-    - OneSignal (= 2.10.1)
+  - react-native-onesignal (3.9.3):
+    - OneSignal (= 2.16.1)
     - React (< 1.0.0, >= 0.13.0)
   - react-native-webview (11.0.2):
     - React-Core
@@ -277,7 +275,6 @@ DEPENDENCIES:
   - React-jsi (from `../node_modules/react-native/ReactCommon/jsi`)
   - React-jsiexecutor (from `../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
-  - react-native-key-pair (from `../node_modules/react-native-key-pair`)
   - react-native-onesignal (from `../node_modules/react-native-onesignal`)
   - react-native-webview (from `../node_modules/react-native-webview`)
   - React-RCTActionSheet (from `../node_modules/react-native/Libraries/ActionSheetIOS`)
@@ -330,8 +327,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/jsiexecutor"
   React-jsinspector:
     :path: "../node_modules/react-native/ReactCommon/jsinspector"
-  react-native-key-pair:
-    :path: "../node_modules/react-native-key-pair"
   react-native-onesignal:
     :path: "../node_modules/react-native-onesignal"
   react-native-webview:
@@ -370,7 +365,7 @@ SPEC CHECKSUMS:
   FBReactNativeSpec: 7da9338acfb98d4ef9e5536805a0704572d33c2f
   Folly: b73c3869541e86821df3c387eb0af5f65addfab4
   glog: 40a13f7840415b9a77023fbcae0f1e6f43192af3
-  OneSignal: 8fb749fa07f88006403c9b659a570fb7fb74519a
+  OneSignal: 5f6514ec2b931306eb067acb124afbb2e49970af
   RCTRequired: 48884c74035a0b5b76dbb7a998bd93bcfc5f2047
   RCTTypeSafety: edf4b618033c2f1c5b7bc3d90d8e085ed95ba2ab
   React: f36e90f3ceb976546e97df3403e37d226f79d0e3
@@ -381,8 +376,7 @@ SPEC CHECKSUMS:
   React-jsi: df07aa95b39c5be3e41199921509bfa929ed2b9d
   React-jsiexecutor: b56c03e61c0dd5f5801255f2160a815f4a53d451
   React-jsinspector: 8e68ffbfe23880d3ee9bafa8be2777f60b25cbe2
-  react-native-key-pair: d45fb2e417ffb0fca307e9bbe22111aa38c3233f
-  react-native-onesignal: 8958311abbd9125f26e600914e48833b57321cbf
+  react-native-onesignal: f92b6fae16388422f1b5d73b2c31e7000f481ae8
   react-native-webview: dfd7202ff115c44d3ea401c2f36122fb3ac79f07
   React-RCTActionSheet: 53ea72699698b0b47a6421cb1c8b4ab215a774aa
   React-RCTAnimation: 1befece0b5183c22ae01b966f5583f42e69a83c2
