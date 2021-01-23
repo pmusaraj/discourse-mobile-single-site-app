@@ -1,7 +1,7 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    CFPropertyList (3.0.2)
+    CFPropertyList (3.0.3)
     addressable (2.7.0)
       public_suffix (>= 2.0.2, < 5.0)
     atomos (0.1.3)
@@ -81,7 +81,7 @@ GEM
       xcodeproj (>= 1.13.0, < 2.0.0)
       xcpretty (~> 0.3.0)
       xcpretty-travis-formatter (>= 0.0.3)
-    fastlane-plugin-firebase_app_distribution (0.2.4)
+    fastlane-plugin-firebase_app_distribution (0.2.5)
     fastlane-plugin-increment_version_code (0.4.3)
     fastlane-plugin-update_provisioning_profile_specifier (1.3.1)
       xcodeproj (>= 1.3.3)
@@ -184,4 +184,4 @@ DEPENDENCIES
   fastlane-plugin-update_provisioning_profile_specifier
 
 BUNDLED WITH
-   2.1.4
+   2.2.3

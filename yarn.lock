@@ -5770,14 +5770,10 @@ react-native-device-info@7.2.0:
   resolved "https://registry.yarnpkg.com/react-native-device-info/-/react-native-device-info-7.2.0.tgz#9694f0bba4edd5842d6af13217019760f5ce058c"
   integrity sha512-QEJ/6a+P309gzwxK2qIc5poD58N3oulDri+0L23pEjsMUV1V0CwuyBr+XvN1cJjCAi4C0dHUgvgwQE0hLi8cxQ==
 
-"react-native-key-pair@git+https://github.com/pmusaraj/react-native-key-pair.git":
-  version "1.1.1"
-  resolved "git+https://github.com/pmusaraj/react-native-key-pair.git#5651ef10987574bae58f794030133e4b5da23779"
-
-react-native-onesignal@3.3.2:
-  version "3.3.2"
-  resolved "https://registry.yarnpkg.com/react-native-onesignal/-/react-native-onesignal-3.3.2.tgz#3c9cb7f8ac919de3f414089613a114406180a309"
-  integrity sha512-SZBGVVWZ5xAe2ALeE2L5HBIh6hfFKjFqARrV8U80zyLFUN8QatRy1eaXKAHgb7wvnCGR8FoNKI8qF+Z4kIKgjg==
+react-native-onesignal@3.9.3:
+  version "3.9.3"
+  resolved "https://registry.yarnpkg.com/react-native-onesignal/-/react-native-onesignal-3.9.3.tgz#8f8c095f8eed4ca4d934d25d7f33790569076fc9"
+  integrity sha512-ruCwKfBbofb6wDBVDLe37tIrnt3lqoIhPvejk/yIeie21yYirXt3HdytaDH47TuuXclet7HsC+2X39rLFP5JpQ==
   dependencies:
     invariant "^2.2.2"
 
